@@ -1,0 +1,129 @@
+# Игнорировать файлы сборки и бинарные файлы
+**/[Bb]in/
+**/[Oo]bj/
+**/.vs/
+**/packages/
+*.user
+*.suo
+*.userprefs
+*.cache
+*.log
+*.vspscc
+*.vssscc
+*.sln.iml
+*.nupkg
+
+# Игнорировать выходные каталоги сборки
+**/bin/
+**/obj/
+
+# Файлы резервных копий и временные файлы
+*.bak
+*.tmp
+*.temp
+*~
+
+# Файлы пакетов NuGet
+**/*.nupkg
+*.nupkg
+
+# Файлы пакетов NPM
+node_modules/
+**/node_modules/
+
+# Файлы пакетов Bower
+bower_components/
+**/bower_components/
+
+# Файлы пакетов .NET
+**/packages/
+
+# Файлы запуска и конфигурации Visual Studio
+.vs/
+*.userosscache
+*.sln.docstates
+
+# Файлы мониторинга производительности и отладки
+*.diagsession
+*.pidb
+*.iobj
+*.ipdb
+
+# Файлы тестовых результатов
+TestResult.xml
+*.trx
+
+# Файлы публикации
+**/publish/
+**/Publish/
+
+# Файлы резервных копий проектов
+_ReSharper.*
+*.resharper
+
+# Файлы операционной системы
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# Файлы среды выполнения и конфигурации
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.Local.json
+
+# Файлы сертификатов (не коммитить секреты!)
+*.pfx
+*.pem
+*.key
+*.crt
+
+# Файлы базы данных (если используются локальные БД)
+*.mdf
+*.ldf
+*.sdf
+
+# Файлы Docker
+.dockerignore
+Dockerfile
+
+# Файлы IDE
+.idea/
+*.swp
+*.swo
+
+# Файлы текстовых редакторов
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Файлы покрытия кода
+coverage.xml
+**/coverage/
+*.coverage
+*.codecoverage
+
+# Файлы миграций Entity Framework (если не нужны в репозитории)
+# **/Migrations/*.Designer.cs
+# **/Migrations/*.sql
+
+# Исключения - эти файлы должны отслеживаться
+!**/appsettings.json
+!**/appsettings.*.json.example
+!**/.dockerignore
+!Dockerfile
+!.vscode/launch.json
+!.vscode/tasks.json

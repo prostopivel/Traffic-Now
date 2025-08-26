@@ -1,0 +1,8 @@
+﻿namespace Traffic.Data.Entities
+{
+    public class MapEntity
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+    }
+}

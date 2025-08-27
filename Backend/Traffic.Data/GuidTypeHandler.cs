@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Traffic.Data
 {
-    public class GuidTypeHandler : SqlMapper.TypeHandler<Guid>
+    internal class GuidTypeHandler : SqlMapper.TypeHandler<Guid>
     {
         public override Guid Parse(object value)
         {
@@ -16,7 +16,7 @@ namespace Traffic.Data
             if (value is byte[] bytes && bytes.Length == 16)
                 return new Guid(bytes);
 
-            throw new InvalidCastException($"Cannot convert {value} to Guid");
+            throw new InvalidCastException($"Невозможно преобразовать {value} в Guid");
         }
 
         public override void SetValue(IDbDataParameter parameter, Guid value)

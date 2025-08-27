@@ -6,6 +6,6 @@
         public Guid MapId { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

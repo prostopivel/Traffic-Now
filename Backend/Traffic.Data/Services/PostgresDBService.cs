@@ -4,19 +4,19 @@ using Npgsql;
 using System.Data;
 using System.Reflection;
 using System.Text;
-using Traffic.Core.Abstractions;
+using Traffic.Data.Options;
 
-namespace Traffic.Data
+namespace Traffic.Data.Services
 {
-    public class DataService : IDatabaseService
+    internal class PostgresDBService : IDatabaseService
     {
-        private readonly string _connectionString;
-        private readonly ILogger<DataService> _logger;
-        private const string SQL_SCRIPTS_PATH = "SQL";
+        private readonly PostgresDBOptions _options;
+        private readonly ILogger<PostgresDBService> _logger;
+        private const string SQL_MANIFEST_DEFAULT_RESOURCE_NAME = @"SQL\*.sql";
 
-        public DataService(string connectionString, ILogger<DataService> logger)
+        public PostgresDBService(PostgresDBOptions options, ILogger<PostgresDBService> logger)
         {
-            _connectionString = connectionString;
+            _options = options;
             _logger = logger;
         }
 
@@ -24,7 +24,7 @@ namespace Traffic.Data
         {
             try
             {
-                using var connection = new NpgsqlConnection(_connectionString);
+                using var connection = new NpgsqlConnection(_options.ConnectionString);
                 await connection.OpenAsync();
                 return connection.State == ConnectionState.Open;
             }
@@ -37,6 +37,12 @@ namespace Traffic.Data
 
         public async Task InitializeDatabaseAsync()
         {
+            if (!_options.InitializeDB)
+            {
+                _logger.LogInformation("The database will not be initialized.");
+                return;
+            }
+
             _logger.LogInformation("Initializing database...");
 
             if (!await CheckConnectionAsync())
@@ -53,19 +59,27 @@ namespace Traffic.Data
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Database initialization failed");
-                throw;
             }
+        }
+
+        private IDbConnection CreateConnection()
+        {
+            var connection = new NpgsqlConnection(_options.ConnectionString);
+            connection.Open();
+            return connection;
         }
 
         private async Task ExecuteSqlScriptsAsync()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceNames = assembly.GetManifestResourceNames()
-                .Where(name => name.Contains(SQL_SCRIPTS_PATH) && name.EndsWith(".sql"))
-                .OrderBy(name => name)
-                .ToList();
+            var resourceNames = assembly.GetManifestResourceNames().ToList();
+            resourceNames =
+                [.. (resourceNames.Any(name => name.EndsWith(".sql"))
+                    ? resourceNames.Where(name => name.EndsWith(".sql"))
+                    : [SQL_MANIFEST_DEFAULT_RESOURCE_NAME])
+                .OrderBy(name => name)];
 
-            if (!resourceNames.Any())
+            if (resourceNames.Count == 0)
             {
                 throw new KeyNotFoundException("Манифест ресурса SQL не был найден!");
             }
@@ -101,8 +115,8 @@ namespace Traffic.Data
 
             var cleanedScript = string.Join("\n", lines);
 
-            if (cleanedScript.Contains("CREATE OR REPLACE FUNCTION") ||
-                cleanedScript.Contains("create or replace function"))
+            if (cleanedScript.Contains("CREATE OR REPLACE FUNCTION", StringComparison.CurrentCultureIgnoreCase)
+                || cleanedScript.Contains("CREATE FUNCTION", StringComparison.CurrentCultureIgnoreCase))
             {
                 try
                 {
@@ -145,24 +159,10 @@ namespace Traffic.Data
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-            using var stream = assembly.GetManifestResourceStream(resourceName);
-            if (stream == null)
-                throw new FileNotFoundException($"Embedded resource not found: {resourceName}");
-
+            using var stream = assembly.GetManifestResourceStream(resourceName)
+                ?? throw new FileNotFoundException($"Встроенный ресурс не найден: {resourceName}");
             using var reader = new StreamReader(stream, Encoding.UTF8);
             return await reader.ReadToEndAsync();
-        }
-
-        public Task ApplyMigrationsAsync()
-        {
-            throw new NotImplementedException("Migrations are not available!");
-        }
-
-        private IDbConnection CreateConnection()
-        {
-            var connection = new NpgsqlConnection(_connectionString);
-            connection.Open();
-            return connection;
         }
     }
 }

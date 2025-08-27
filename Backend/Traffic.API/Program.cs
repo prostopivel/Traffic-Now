@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Traffic.Core.Abstractions;
 using Traffic.Data;
 
 namespace Traffic.API
@@ -10,7 +9,7 @@ namespace Traffic.API
     {
         private const string DEFAULT_CONNECTION_STRING = "Host=localhost;Port=5432;Database=postgres_traffic;Username=traffic_user;Password=postgres";
 
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             var connectionString = builder.Configuration.GetConnectionString("PostgreSQL")
@@ -22,8 +21,11 @@ namespace Traffic.API
 
             builder.Services.AddSingleton(connectionString);
 
-            builder.Services.AddDataLayer(connectionString);
-            builder.Services.AddScoped<IDatabaseService, DataService>();
+            builder.Services.AddPostgresDatabase(options =>
+            {
+                options.WithConnectionString(connectionString)
+                    .WithInitializeDB(true);
+            });
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -55,10 +57,6 @@ namespace Traffic.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-
-            using var scope = app.Services.CreateScope();
-            var databaseService = scope.ServiceProvider.GetRequiredService<IDatabaseService>();
-            await databaseService.InitializeDatabaseAsync();
 
             app.Run();
         }

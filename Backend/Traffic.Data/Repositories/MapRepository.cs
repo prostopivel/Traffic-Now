@@ -4,14 +4,10 @@ using Traffic.Data.Entities;
 
 namespace Traffic.Data.Repositories
 {
-    public class MapRepository
+    public class MapRepository : RepositoryBase
     {
-        private readonly IDbConnection _connection;
-
-        public MapRepository(IDbConnection connection)
-        {
-            _connection = connection;
-        }
+        public MapRepository(IDbConnection connection) : base(connection)
+        { }
 
         public async Task<MapEntity?> GetAsync(Guid mapId)
         {
@@ -23,13 +19,21 @@ namespace Traffic.Data.Repositories
         public async Task<Guid?> CreateAsync(MapEntity map)
         {
             const string sql = "SELECT create_map(@Id, @Name)";
-            return await _connection.ExecuteScalarAsync<Guid>(sql, new { Map = map });
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                map.Id,
+                map.Name
+            });
         }
 
         public async Task<MapEntity?> UpdateAsync(MapEntity map)
         {
             const string sql = "SELECT update_map(@Id, @Name)";
-            return await _connection.ExecuteScalarAsync<MapEntity>(sql, new { Map = map });
+            return await _connection.ExecuteScalarAsync<MapEntity>(sql, new
+            {
+                map.Id,
+                map.Name
+            });
         }
 
         public async Task<MapEntity?> DeleteAsync(Guid mapId)

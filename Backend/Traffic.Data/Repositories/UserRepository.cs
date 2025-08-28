@@ -5,14 +5,10 @@ using Traffic.Data.Entities;
 
 namespace Traffic.Data.Repositories
 {
-    public class UserRepository
+    public class UserRepository : RepositoryBase
     {
-        private readonly IDbConnection _connection;
-
-        public UserRepository(IDbConnection connection)
-        {
-            _connection = connection;
-        }
+        public UserRepository(IDbConnection connection) : base(connection)
+        { }
 
         public async Task<UserEntity?> GetByEmailAsync(string userEmail)
         {
@@ -26,7 +22,14 @@ namespace Traffic.Data.Repositories
             try
             {
                 const string sql = "SELECT create_user(@Id, @Email, @Password, @IsAdmin)";
-                return (await _connection.ExecuteScalarAsync<Guid>(sql, new { User = user }), string.Empty);
+                var result = await _connection.ExecuteScalarAsync<Guid>(sql, new
+                {
+                    user.Id,
+                    user.Email,
+                    user.Password,
+                    user.IsAdmin
+                });
+                return (result, string.Empty);
             }
             catch (PostgresException ex) when (ex.SqlState == "P0001" && ex.MessageText.Contains("already exists"))
             {
@@ -34,16 +37,21 @@ namespace Traffic.Data.Repositories
             }
         }
 
-        public async Task<UserEntity?> UpdateAsync(UserEntity user)
+        public async Task<Guid?> UpdateAsync(UserEntity user)
         {
             const string sql = "SELECT update_user(@Id, @Email, @Password)";
-            return await _connection.ExecuteScalarAsync<UserEntity>(sql, new { User = user });
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                user.Id,
+                user.Email,
+                user.Password
+            });
         }
 
-        public async Task<UserEntity?> DeleteAsync(Guid userId)
+        public async Task<Guid?> DeleteAsync(Guid userId)
         {
-            const string sql = "SELECT delete_user(@UserEmail)";
-            return await _connection.ExecuteScalarAsync<UserEntity>(sql, new { UserId = userId });
+            const string sql = "SELECT delete_user(@UserId)";
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new { UserId = userId });
         }
     }
 }

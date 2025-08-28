@@ -22,9 +22,9 @@ create table if not exists Points (
 create table if not exists Transport (
 	Id uuid PRIMARY KEY,
 	UserId uuid,
-	X double precision,
-	Y double precision,
-	foreign key(UserId) references Users(Id) on delete cascade
+	PointId uuid,
+	foreign key(UserId) references Users(Id) on delete cascade,
+	foreign key(PointId) references Points(Id) on delete cascade
 );
 
 create table if not exists Points_Points (

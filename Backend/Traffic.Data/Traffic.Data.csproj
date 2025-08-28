@@ -18,4 +18,8 @@
     <EmbeddedResource Include="SQL\*.sql" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Traffic.Core\Traffic.Core.csproj" />
+  </ItemGroup>
+
 </Project>

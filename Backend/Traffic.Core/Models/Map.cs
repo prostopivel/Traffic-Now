@@ -1,6 +1,8 @@
-﻿namespace Traffic.Core.Models
+﻿using Traffic.Core.Entities;
+
+namespace Traffic.Core.Models
 {
-    internal class Map
+    public class Map
     {
         public Guid Id { get; }
 
@@ -10,6 +12,17 @@
 
         public Map()
         {
+        }
+
+        public Map(MapEntity? mapEntity)
+        {
+            if (mapEntity == null)
+            {
+                return;
+            }
+
+            Id = mapEntity.Id;
+            Name = mapEntity.Name;
         }
 
         private Map(Guid id, string name, List<Point> points)

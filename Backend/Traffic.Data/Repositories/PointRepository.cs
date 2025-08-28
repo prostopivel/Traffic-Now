@@ -1,22 +1,24 @@
 ﻿using Dapper;
 using System.Data;
-using Traffic.Data.Entities;
+using Traffic.Core.Abstractions.Repositories;
+using Traffic.Core.Entities;
+using Traffic.Core.Models;
 
 namespace Traffic.Data.Repositories
 {
-    public class PointRepository : RepositoryBase
+    public class PointRepository : RepositoryBase, IPointRepository
     {
         public PointRepository(IDbConnection connection) : base(connection)
         { }
 
-        public async Task<PointEntity?> GetAsync(Guid pointId)
+        public async Task<Point?> GetAsync(Guid pointId)
         {
             const string sql = "SELECT * FROM select_point(@PointId)";
             var result = await _connection.QueryAsync<PointEntity>(sql, new { PointId = pointId });
-            return result.FirstOrDefault();
+            return new Point(result.FirstOrDefault());
         }
 
-        public async Task<Guid?> CreateAsync(PointEntity point)
+        public async Task<Guid?> CreateAsync(Point point)
         {
             const string sql = "SELECT create_point(@Id, @MapId, @X, @Y, @Name)";
             return await _connection.ExecuteScalarAsync<Guid>(sql, new
@@ -29,18 +31,18 @@ namespace Traffic.Data.Repositories
             });
         }
 
-        public async Task<List<PointEntity>?> GetMapPointsAsync(Guid mapId)
+        public async Task<List<Point>?> GetMapPointsAsync(Guid mapId)
         {
             const string sql = "SELECT * FROM select_map_points(@CurrentMapId)";
             var result = await _connection.QueryAsync<PointEntity>(sql, new { CurrentMapId = mapId });
-            return [.. result];
+            return [.. result.Select(p => new Point(p))];
         }
 
-        public async Task<List<PointEntity>?> GetConnectedPointsAsync(Guid pointId)
+        public async Task<List<Point>?> GetConnectedPointsAsync(Guid pointId)
         {
             const string sql = "SELECT * FROM select_connected_points(@PointId)";
             var result = await _connection.QueryAsync<PointEntity>(sql, new { PointId = pointId });
-            return [.. result];
+            return [.. result.Select(p => new Point(p))];
         }
     }
 }

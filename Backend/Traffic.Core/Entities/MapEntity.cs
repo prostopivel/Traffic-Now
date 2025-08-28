@@ -1,4 +1,6 @@
-﻿namespace Traffic.Data.Entities
+﻿using Traffic.Core.Models;
+
+namespace Traffic.Core.Entities
 {
     public class MapEntity
     {

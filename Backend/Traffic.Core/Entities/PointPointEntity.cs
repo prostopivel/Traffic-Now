@@ -1,4 +1,4 @@
-﻿namespace Traffic.Data.Entities
+﻿namespace Traffic.Core.Entities
 {
     public class PointPointEntity
     {

@@ -1,6 +1,8 @@
-﻿namespace Traffic.Core.Models
+﻿using Traffic.Core.Entities;
+
+namespace Traffic.Core.Models
 {
-    internal class Point
+    public class Point
     {
         public Guid Id { get; }
 
@@ -16,6 +18,20 @@
 
         public Point()
         {
+        }
+
+        public Point(PointEntity? pointEntity)
+        {
+            if (pointEntity == null)
+            {
+                return;
+            }
+
+            Id = pointEntity.Id;
+            MapId = pointEntity.MapId;
+            X = pointEntity.X;
+            Y = pointEntity.Y;
+            Name = pointEntity.Name;
         }
 
         private Point(Guid id, Guid mapId, double x, double y)

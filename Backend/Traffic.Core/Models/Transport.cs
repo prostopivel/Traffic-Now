@@ -1,10 +1,14 @@
-﻿namespace Traffic.Core.Models
+﻿using Traffic.Core.Entities;
+
+namespace Traffic.Core.Models
 {
-    internal class Transport
+    public class Transport
     {
         public Guid Id { get; }
 
         public Guid UserId { get; }
+
+        public Guid PointId { get; set; }
 
         public double X { get; set; }
 
@@ -14,15 +18,28 @@
         {
         }
 
-        private Transport(Guid id, Guid userId, double startX, double startY)
+        public Transport(TransportEntity? transportEntity)
+        {
+            if (transportEntity == null)
+            {
+                return;
+            }
+
+            Id = transportEntity.Id;
+            UserId = transportEntity.UserId;
+            PointId = transportEntity.PointId;
+        }
+
+        private Transport(Guid id, Guid userId, Guid pointId, double startX, double startY)
         {
             Id = id;
             UserId = userId;
+            PointId = pointId;
             X = startX;
             Y = startY;
         }
 
-        public static (Transport? transport, string Error) Create(Guid id, Guid userId, double startX, double startY)
+        public static (Transport? transport, string Error) Create(Guid id, Guid userId, Guid pointId, double startX, double startY)
         {
             var Error = string.Empty;
             Transport? transport = null;
@@ -33,7 +50,7 @@
             }
             else
             {
-                transport = new Transport(id, userId, startX, startY);
+                transport = new Transport(id, userId, pointId, startX, startY);
             }
 
             return (transport, Error);

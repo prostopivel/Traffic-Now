@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using Traffic.Core.Entities;
 
 namespace Traffic.Core.Models
 {
-    internal class User
+    public class User
     {
         private static readonly Regex _emailRegex = new Regex(
             @"^(?!\.)(?!.*\.\.)([a-zA-Z0-9._%+-]+)(?<!\.)@(?!\.)([a-zA-Z0-9.-]+)(?<!\.)\.[a-zA-Z]{2,}$",
@@ -19,6 +20,19 @@ namespace Traffic.Core.Models
 
         public User()
         {
+        }
+
+        public User(UserEntity? userEntity)
+        {
+            if (userEntity == null)
+            {
+                return;
+            }
+
+            Id = userEntity.Id;
+            Email = userEntity.Email;
+            Password = userEntity.Password;
+            IsAdmin = userEntity.IsAdmin;
         }
 
         private User(Guid id, string email, string password, bool isAdmin)

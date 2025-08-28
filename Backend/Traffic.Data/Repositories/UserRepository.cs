@@ -1,23 +1,25 @@
 ﻿using Dapper;
 using Npgsql;
 using System.Data;
-using Traffic.Data.Entities;
+using Traffic.Core.Abstractions.Repositories;
+using Traffic.Core.Entities;
+using Traffic.Core.Models;
 
 namespace Traffic.Data.Repositories
 {
-    public class UserRepository : RepositoryBase
+    public class UserRepository : RepositoryBase, IUserRepository
     {
         public UserRepository(IDbConnection connection) : base(connection)
         { }
 
-        public async Task<UserEntity?> GetByEmailAsync(string userEmail)
+        public async Task<User?> GetByEmailAsync(string userEmail)
         {
             const string sql = "SELECT * FROM get_user_by_email(@UserEmail)";
             var result = await _connection.QueryAsync<UserEntity>(sql, new { UserEmail = userEmail });
-            return result.FirstOrDefault();
+            return new User(result.FirstOrDefault());
         }
 
-        public async Task<(Guid?, string Error)> CreateAsync(UserEntity user)
+        public async Task<(Guid?, string Error)> CreateAsync(User user)
         {
             try
             {
@@ -37,7 +39,7 @@ namespace Traffic.Data.Repositories
             }
         }
 
-        public async Task<Guid?> UpdateAsync(UserEntity user)
+        public async Task<Guid?> UpdateAsync(User user)
         {
             const string sql = "SELECT update_user(@Id, @Email, @Password)";
             return await _connection.ExecuteScalarAsync<Guid>(sql, new

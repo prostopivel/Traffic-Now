@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Traffic.Application\Traffic.Application.csproj" />
     <ProjectReference Include="..\Traffic.Core\Traffic.Core.csproj" />
     <ProjectReference Include="..\Traffic.Data\Traffic.Data.csproj" />
   </ItemGroup>

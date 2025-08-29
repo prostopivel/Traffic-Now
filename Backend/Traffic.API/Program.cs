@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Traffic.Application.Services;
+using Traffic.Core.Abstractions.Repositories;
+using Traffic.Core.Abstractions.Services;
 using Traffic.Data;
+using Traffic.Data.Repositories;
 
 namespace Traffic.API
 {
@@ -42,6 +46,9 @@ namespace Traffic.API
                     };
                 });
 
+            ConfigureRepositories(builder);
+            ConfigureRepositoryServices(builder);
+
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
@@ -59,6 +66,22 @@ namespace Traffic.API
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static void ConfigureRepositories(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IPointRepository, PointRepository>();
+            builder.Services.AddScoped<IMapRepository, MapRepository>();
+            builder.Services.AddScoped<ITransportRepository, TransportRepository>();
+        }
+
+        private static void ConfigureRepositoryServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPointService, PointService>();
+            builder.Services.AddScoped<IMapService, MapService>();
+            builder.Services.AddScoped<ITransportService, TransportService>();
         }
     }
 }

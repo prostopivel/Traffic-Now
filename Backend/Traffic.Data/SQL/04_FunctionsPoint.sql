@@ -7,8 +7,8 @@ returns table (
 	Name varchar(100)
 ) as $$
 begin
-	return query select * from Points
-	where Id = PointId;
+	return query select * from Points p
+	where p.Id = PointId;
 end;
 $$ language plpgsql;
 

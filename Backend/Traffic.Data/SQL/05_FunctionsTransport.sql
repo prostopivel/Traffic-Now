@@ -5,8 +5,8 @@ returns table (
 	PointId uuid
 ) as $$
 begin
-	return query select * from Transport
-	where Id = TransportId;
+	return query select * from Transport t
+	where t.Id = TransportId;
 end;
 $$ language plpgsql;
 

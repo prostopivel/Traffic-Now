@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Traffic.Core\Traffic.Core.csproj" />
-    <ProjectReference Include="..\Traffic.Data\Traffic.Data.csproj" />
+	  <ProjectReference Include="..\Traffic.Core\Traffic.Core.csproj" />
+	  <ProjectReference Include="..\Traffic.Data\Traffic.Data.csproj" />
   </ItemGroup>
 
 </Project>

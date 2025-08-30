@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficNow - Панель управления</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/menu.css">
+    <!-- Иконочный шрифт для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="menu-container">
+        <!-- Боковое меню -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🚗 TrafficNow</h2>
+            </div>
+            <div class="nav-items">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i> Главная
+                </a>
+                <a href="#" class="nav-item" onclick="getProtectedData('/map', 'GET')">
+                    <i class="fas fa-map"></i> Просмотр карты
+                </a>
+                <a href="#" class="nav-item" onclick="getProtectedData('/vehicles', 'GET')">
+                    <i class="fas fa-bus"></i> Просмотр транспорта
+                </a>
+                <a href="#" class="nav-item" onclick="getProtectedData('/profile', 'GET')">
+                    <i class="fas fa-user-cog"></i> Изменение информации
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-history"></i> История поездок
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-line"></i> Аналитика
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i> Настройки
+                </a>
+            </div>
+        </div>
+        
+        <!-- Основной контент -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Добро пожаловать в панель управления</h1>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Текущее местоположение</h3>
+                    </div>
+                    <p id="currentPos">Ваш транспорт находится в районе центрального вокзала. Скорость: 45 км/ч</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-route"></i>
+                        <h3>Активный маршрут</h3>
+                    </div>
+                    <p id="currentRoute">Маршрут №12: Центральный вокзал → Южный район → Восточный терминал</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>Статистика сегодня</h3>
+                    </div>
+                    <p id="currentTime">Пройдено: 124 км. В пути: 3 ч 45 мин. Осталось: 45 мин</p>
+                </div>
+            </div>
+            
+            <h2 style="margin-bottom: 10px;">Быстрые действия</h2>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="getProtectedData('/map', 'GET')">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Просмотр карты
+                </button>
+                
+                <button class="action-btn" onclick="getProtectedData('/vehicles', 'GET')">
+                    <i class="fas fa-bus"></i>
+                    Просмотр транспорта
+                </button>
+                
+                <button class="action-btn" onclick="getProtectedData('/profile', 'GET')">
+                    <i class="fas fa-user-edit"></i>
+                    Изменить профиль
+                </button>
+                
+                <button class="action-btn">
+                    <i class="fas fa-download"></i>
+                    Скачать отчет
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+</body>
+</html>

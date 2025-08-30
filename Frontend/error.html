@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка - TrafficNow</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/error.css">
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-content">
+            <div class="error-icon">⚠️</div>
+            <h1 id="errorTitle">Произошла ошибка</h1>
+            <p id="errorMessage">Попробуйте обновить страницу или вернуться на главную</p>
+            <div class="error-details" id="errorDetails" style="display: none;">
+                <p><strong>Код ошибки:</strong> <span id="errorCode"></span></p>
+                <p><strong>Статус:</strong> <span id="errorStatus"></span></p>
+            </div>
+            <div class="error-actions">
+                <a href="index.html" class="btn btn-primary">На главную</a>
+                <button onclick="history.back()" class="btn btn-secondary">Назад</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/error.js"></script>
+</body>
+</html>

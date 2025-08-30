@@ -27,7 +27,7 @@ namespace Traffic.API.Controllers
         {
             var user = await _userService.GetByEmailAsync(request.Username);
             if (user == null)
-                return Unauthorized();
+                return Unauthorized(new { message = "Неверный пароль!" });
 
             var serverHash = HashPassword(request.Password, _configuration["Salt"]!);
 

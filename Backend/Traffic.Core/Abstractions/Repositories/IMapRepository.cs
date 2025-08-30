@@ -5,7 +5,7 @@ namespace Traffic.Core.Abstractions.Repositories
     public interface IMapRepository
     {
         Task<Map?> GetAsync(Guid mapId);
-        Task<Guid?> CreateAsync(Map map, IEnumerable<Point> points);
+        Task<Guid?> CreateAsync(Map map);
         Task<Guid?> UpdateAsync(Map map);
         Task<Guid?> DeleteAsync(Guid mapId);
         Task<Map?> GetMapPointsAsync(Guid mapId);

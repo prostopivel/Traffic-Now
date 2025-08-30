@@ -28,6 +28,11 @@ namespace Traffic.Application.Services
             return await _pointRepository.GetMapPointsAsync(mapId);
         }
 
+        public async Task<List<Point>?> GetRoutePointsAsync(Guid routeId)
+        {
+            return await _pointRepository.GetRoutePointsAsync(routeId);
+        }
+
         public async Task<List<Point>?> GetConnectedPointsAsync(Guid pointId)
         {
             return await _pointRepository.GetConnectedPointsAsync(pointId);

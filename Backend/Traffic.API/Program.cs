@@ -74,6 +74,7 @@ namespace Traffic.API
             builder.Services.AddScoped<IPointRepository, PointRepository>();
             builder.Services.AddScoped<IMapRepository, MapRepository>();
             builder.Services.AddScoped<ITransportRepository, TransportRepository>();
+            builder.Services.AddScoped<IRouteRepository, RouteRepository>();
         }
 
         private static void ConfigureRepositoryServices(WebApplicationBuilder builder)
@@ -82,6 +83,7 @@ namespace Traffic.API
             builder.Services.AddScoped<IPointService, PointService>();
             builder.Services.AddScoped<IMapService, MapService>();
             builder.Services.AddScoped<ITransportService, TransportService>();
+            builder.Services.AddScoped<IRouteService, RouteService>();
         }
     }
 }

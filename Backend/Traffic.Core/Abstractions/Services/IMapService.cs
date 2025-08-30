@@ -1,4 +1,5 @@
-﻿using Traffic.Core.Models;
+﻿using Traffic.Core.Abstractions.Repositories;
+using Traffic.Core.Models;
 
 namespace Traffic.Core.Abstractions.Services
 {
@@ -8,5 +9,7 @@ namespace Traffic.Core.Abstractions.Services
         Task<Guid?> DeleteAsync(Guid mapId);
         Task<Map?> GetAsync(Guid mapId);
         Task<Guid?> UpdateAsync(Map map);
+        Task<Map?> GetMapPointsAsync(Guid mapId);
+        Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points);
     }
 }

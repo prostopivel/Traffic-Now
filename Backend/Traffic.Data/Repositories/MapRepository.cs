@@ -27,7 +27,7 @@ namespace Traffic.Data.Repositories
             return new Map(result.FirstOrDefault());
         }
 
-        public async Task<Guid?> CreateAsync(Map map, IEnumerable<Point> points)
+        public async Task<Guid?> CreateAsync(Map map)
         {
             const string sql = "SELECT create_map(@Id, @Name)";
             return await _connection.ExecuteScalarAsync<Guid>(sql, new

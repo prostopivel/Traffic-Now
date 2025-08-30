@@ -32,5 +32,15 @@ namespace Traffic.Application.Services
         {
             return await _mapRepository.DeleteAsync(mapId);
         }
+
+        public async Task<Map?> GetMapPointsAsync(Guid mapId)
+        {
+            return await _mapRepository.GetMapPointsAsync(mapId);
+        }
+
+        public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)
+        {
+            return await _mapRepository.CreateMapPointsAsync(points);
+        }
     }
 }

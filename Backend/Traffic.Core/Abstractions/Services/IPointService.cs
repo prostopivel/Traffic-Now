@@ -7,6 +7,7 @@ namespace Traffic.Core.Abstractions.Services
         Task<Guid?> CreateAsync(Point point);
         Task<Point?> GetAsync(Guid pointId);
         Task<List<Point>?> GetConnectedPointsAsync(Guid pointId);
+        Task<List<Point>?> GetRoutePointsAsync(Guid routeId);
         Task<List<Point>?> GetMapPointsAsync(Guid mapId);
     }
 }

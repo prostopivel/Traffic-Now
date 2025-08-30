@@ -15,7 +15,11 @@ namespace Traffic.Data.Repositories
         public async Task<User?> GetByEmailAsync(string userEmail)
         {
             const string sql = "SELECT * FROM get_user_by_email(@UserEmail)";
-            var result = await _connection.QueryAsync<UserEntity>(sql, new { UserEmail = userEmail });
+            var result = await _connection.QueryAsync<UserEntity>(sql, new
+            {
+                UserEmail = userEmail
+            });
+
             return new User(result.FirstOrDefault());
         }
 
@@ -31,6 +35,7 @@ namespace Traffic.Data.Repositories
                     user.Password,
                     user.IsAdmin
                 });
+
                 return (result, string.Empty);
             }
             catch (PostgresException ex) when (ex.SqlState == "P0001" && ex.MessageText.Contains("already exists"))
@@ -42,6 +47,7 @@ namespace Traffic.Data.Repositories
         public async Task<Guid?> UpdateAsync(User user)
         {
             const string sql = "SELECT update_user(@Id, @Email, @Password)";
+
             return await _connection.ExecuteScalarAsync<Guid>(sql, new
             {
                 user.Id,
@@ -53,7 +59,11 @@ namespace Traffic.Data.Repositories
         public async Task<Guid?> DeleteAsync(Guid userId)
         {
             const string sql = "SELECT delete_user(@UserId)";
-            return await _connection.ExecuteScalarAsync<Guid>(sql, new { UserId = userId });
+
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                UserId = userId
+            });
         }
     }
 }

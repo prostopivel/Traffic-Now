@@ -25,8 +25,9 @@ returns table (
 	IsAdmin boolean
 ) as $$
 begin
-	return query select * from Users
-	where Email = UserEmail;
+	return query
+	select u.Id, u.Email, u.Password, u.IsAdmin from Users u
+	where u.Email = UserEmail;
 end;
 $$ language plpgsql;
 
@@ -67,9 +68,3 @@ begin
 	return UserId;
 end;
 $$ language plpgsql;
-
-
-
-
-
-

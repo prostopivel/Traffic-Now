@@ -14,7 +14,11 @@ namespace Traffic.Data.Repositories
         public async Task<Point?> GetAsync(Guid pointId)
         {
             const string sql = "SELECT * FROM select_point(@PointId)";
-            var result = await _connection.QueryAsync<PointEntity>(sql, new { PointId = pointId });
+            var result = await _connection.QueryAsync<PointEntity>(sql, new
+            {
+                PointId = pointId
+            });
+
             return new Point(result.FirstOrDefault());
         }
 
@@ -34,14 +38,33 @@ namespace Traffic.Data.Repositories
         public async Task<List<Point>?> GetMapPointsAsync(Guid mapId)
         {
             const string sql = "SELECT * FROM select_map_points(@CurrentMapId)";
-            var result = await _connection.QueryAsync<PointEntity>(sql, new { CurrentMapId = mapId });
+            var result = await _connection.QueryAsync<PointEntity>(sql, new
+            {
+                CurrentMapId = mapId
+            });
+
+            return [.. result.Select(p => new Point(p))];
+        }
+
+        public async Task<List<Point>?> GetRoutePointsAsync(Guid routeId)
+        {
+            const string sql = "SELECT * FROM select_route_points(@CurrentRouteId)";
+            var result = await _connection.QueryAsync<PointEntity>(sql, new
+            {
+                CurrentRouteId = routeId
+            });
+
             return [.. result.Select(p => new Point(p))];
         }
 
         public async Task<List<Point>?> GetConnectedPointsAsync(Guid pointId)
         {
             const string sql = "SELECT * FROM select_connected_points(@PointId)";
-            var result = await _connection.QueryAsync<PointEntity>(sql, new { PointId = pointId });
+            var result = await _connection.QueryAsync<PointEntity>(sql, new
+            {
+                PointId = pointId
+            });
+
             return [.. result.Select(p => new Point(p))];
         }
     }

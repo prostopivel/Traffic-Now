@@ -14,7 +14,11 @@ namespace Traffic.Data.Repositories
         public async Task<Transport?> GetAsync(Guid transportId)
         {
             const string sql = "SELECT * FROM select_transport(@TransportId)";
-            var result = await _connection.QueryAsync<TransportEntity>(sql, new { TransportId = transportId });
+            var result = await _connection.QueryAsync<TransportEntity>(sql, new
+            {
+                TransportId = transportId
+            });
+
             return new Transport(result.FirstOrDefault());
         }
 
@@ -43,20 +47,33 @@ namespace Traffic.Data.Repositories
         public async Task<Guid?> DeleteAsync(Guid transportId)
         {
             const string sql = "SELECT delete_transport(@TransportId)";
-            return await _connection.ExecuteScalarAsync<Guid>(sql, new { TransportId = transportId });
+
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                TransportId = transportId
+            });
         }
 
         public async Task<List<Transport>?> GetUserTransportAsync(Guid userId)
         {
             const string sql = "SELECT * FROM select_user_transport(@CurrentUserId)";
-            var result = await _connection.QueryAsync<TransportEntity>(sql, new { CurrentUserId = userId });
+            var result = await _connection.QueryAsync<TransportEntity>(sql, new
+            {
+                CurrentUserId = userId
+            });
+
             return [.. result.Select(t => new Transport(t))];
         }
 
         public async Task<List<Transport>?> GetUserTransportAsync(Guid mapId, Guid userId)
         {
             const string sql = "SELECT * FROM select_map_user_transport(@CurrentMapId, @CurrentUserId)";
-            var result = await _connection.QueryAsync<TransportEntity>(sql, new { CurrentMapId = mapId, CurrentUserId = userId });
+            var result = await _connection.QueryAsync<TransportEntity>(sql, new
+            {
+                CurrentMapId = mapId,
+                CurrentUserId = userId
+            });
+
             return [.. result.Select(t => new Transport(t))];
         }
     }

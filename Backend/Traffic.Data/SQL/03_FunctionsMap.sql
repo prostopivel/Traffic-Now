@@ -4,8 +4,9 @@ returns table(
 	Name varchar(100)
 ) as $$
 begin
-	return query select * from Maps
-	where Id = MapId;
+	return query
+	select m.Id, m.Name from Maps m
+	where m.Id = MapId;
 end;
 $$ language plpgsql;
 
@@ -43,12 +44,3 @@ begin
 	return MapId;
 end;
 $$ language plpgsql;
-
-
-
-
-
-
-
-
-

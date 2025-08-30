@@ -5,19 +5,20 @@ returns table (
 	PointId uuid
 ) as $$
 begin
-	return query select * from Transport
-	where Id = TransportId;
+	return query
+	select t.Id, t.UserId, t.PointId from Transport t
+	where t.Id = TransportId;
 end;
 $$ language plpgsql;
 
 create or replace function create_transport(
 	TransportId uuid,
-	UserId uuid,
-	PointId uuid)
+	TransportUserId uuid,
+	TransportPointId uuid)
 returns uuid as $$
 begin
 	insert into Transport (Id, UserId, PointId)
-	values (TransportId, UserId, PointId);
+	values (TransportId, TransportUserId, TransportPointId);
 
 	return TransportId;
 end;
@@ -54,8 +55,9 @@ returns table (
 	PointId uuid
 ) as $$
 begin
-	return query select * from Transport t
-	join User u on t.UserId = u.Id
+	return query
+	select t.Id, t.UserId, t.PointId from Transport t
+	join Users u on t.UserId = u.Id
 	where u.Id = CurrentUserId;
 end;
 $$ language plpgsql;
@@ -67,19 +69,10 @@ returns table (
 	PointId uuid
 ) as $$
 begin
-	return query select * from select_user_transport(CurrentUserId) t
-	join Point p on t.PointId = p.Id
-	join Map m on p.MapId = m.Id
+	return query
+	select t.Id, t.UserId, t.PointId from select_user_transport(CurrentUserId) t
+	join Points p on t.PointId = p.Id
+	join Maps m on p.MapId = m.Id
 	where m.Id = CurrentMapId;
 end;
 $$ language plpgsql;
-
-
-
-
-
-
-
-
-
-

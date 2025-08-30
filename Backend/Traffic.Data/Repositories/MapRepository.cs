@@ -1,24 +1,33 @@
 ﻿using Dapper;
 using System.Data;
-using Traffic.Core.Entities;
 using Traffic.Core.Abstractions.Repositories;
+using Traffic.Core.Entities;
 using Traffic.Core.Models;
 
 namespace Traffic.Data.Repositories
 {
     public class MapRepository : RepositoryBase, IMapRepository
     {
-        public MapRepository(IDbConnection connection) : base(connection)
-        { }
+        private readonly IPointRepository _pointRepository;
+
+        public MapRepository(IDbConnection connection, IPointRepository pointRepository)
+            : base(connection)
+        {
+            _pointRepository = pointRepository;
+        }
 
         public async Task<Map?> GetAsync(Guid mapId)
         {
             const string sql = "SELECT * FROM select_map(@MapId)";
-            var result = await _connection.QueryAsync<MapEntity>(sql, new { MapId = mapId });
+            var result = await _connection.QueryAsync<MapEntity>(sql, new
+            {
+                MapId = mapId
+            });
+
             return new Map(result.FirstOrDefault());
         }
 
-        public async Task<Guid?> CreateAsync(Map map)
+        public async Task<Guid?> CreateAsync(Map map, IEnumerable<Point> points)
         {
             const string sql = "SELECT create_map(@Id, @Name)";
             return await _connection.ExecuteScalarAsync<Guid>(sql, new
@@ -31,6 +40,7 @@ namespace Traffic.Data.Repositories
         public async Task<Guid?> UpdateAsync(Map map)
         {
             const string sql = "SELECT update_map(@Id, @Name)";
+
             return await _connection.ExecuteScalarAsync<Guid>(sql, new
             {
                 map.Id,
@@ -41,7 +51,65 @@ namespace Traffic.Data.Repositories
         public async Task<Guid?> DeleteAsync(Guid mapId)
         {
             const string sql = "SELECT delete_map(@MapId)";
-            return await _connection.ExecuteScalarAsync<Guid>(sql, new { MapId = mapId });
+
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                MapId = mapId
+            });
+        }
+
+        public async Task<Map?> GetMapPointsAsync(Guid mapId)
+        {
+            var result = await GetAsync(mapId);
+            var pointsResult = await _pointRepository.GetMapPointsAsync(mapId);
+
+            pointsResult?.ForEach(p => result?.AddPoint(p));
+
+            return result;
+        }
+
+        public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)
+        {
+            var Error = string.Empty;
+            var mapId = points?.First().MapId;
+            if (mapId == null || await GetAsync((Guid)mapId) == null)
+            {
+                Error = $"Карта с Id '{mapId}' не существует!";
+                return (null, Error);
+            }
+
+            using var transaction = _connection.BeginTransaction();
+            try
+            {
+                //Создание точек
+                foreach (var point in points!)
+                {
+                    await _pointRepository.CreateAsync(point);
+                }
+
+                //Соединение точек
+                const string connectSql = "SELECT connect_points(@PointLeftId, @PointRightId)";
+                foreach (var point in points)
+                {
+                    foreach (var connectedPoint in point?.ConnectedPoints ?? [])
+                    {
+                        await _connection.ExecuteScalarAsync<Guid>(connectSql, new
+                        {
+                            PointLeftId = point.Id,
+                            PointRightId = connectedPoint.Id
+                        });
+                    }
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                Error = $"Ошибка при создании точек: {ex.Message}";
+            }
+
+            return (mapId, Error);
         }
     }
 }

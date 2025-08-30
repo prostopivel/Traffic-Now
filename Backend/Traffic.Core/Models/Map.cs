@@ -32,6 +32,11 @@ namespace Traffic.Core.Models
             Points = points;
         }
 
+        public void AddPoint(Point point)
+        {
+            Points.Add(point);
+        }
+
         public static (Map? map, string Error) Create(Guid id, string name, List<Point> points)
         {
             var Error = string.Empty;

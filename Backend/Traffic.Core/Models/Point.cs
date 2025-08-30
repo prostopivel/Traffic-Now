@@ -8,6 +8,8 @@ namespace Traffic.Core.Models
 
         public Guid MapId { get; }
 
+        public Map Map { get; set; }
+
         public double X { get; }
 
         public double Y { get; }

@@ -8,7 +8,11 @@ namespace Traffic.Core.Models
 
         public Guid UserId { get; }
 
+        public User User { get; set; }
+
         public Guid PointId { get; set; }
+
+        public Point Point { get; set; }
 
         public double X { get; set; }
 

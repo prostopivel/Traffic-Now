@@ -68,7 +68,7 @@ namespace Traffic.Data.Repositories
             return result;
         }
 
-        public async Task<List<Map>?> GetUserMap(Guid userId)
+        public async Task<List<Map>?> GetUserMaps(Guid userId)
         {
             const string sql = "SELECT * FROM select_user_maps(@UserId)";
 

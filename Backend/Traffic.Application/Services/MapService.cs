@@ -38,6 +38,16 @@ namespace Traffic.Application.Services
             return await _mapRepository.GetMapPointsAsync(mapId);
         }
 
+        public async Task<List<Map>?> GetUserMaps(Guid userId)
+        {
+            return await _mapRepository.GetUserMaps(userId);
+        }
+
+        public async Task<Guid?> AddUserMap(Guid userId, Guid mapId)
+        {
+            return await _mapRepository.AddUserMap(userId, mapId);
+        }
+
         public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)
         {
             return await _mapRepository.CreateMapPointsAsync(points);

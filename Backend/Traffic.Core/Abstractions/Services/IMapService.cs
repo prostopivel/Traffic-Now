@@ -10,6 +10,8 @@ namespace Traffic.Core.Abstractions.Services
         Task<Map?> GetAsync(Guid mapId);
         Task<Guid?> UpdateAsync(Map map);
         Task<Map?> GetMapPointsAsync(Guid mapId);
+        Task<List<Map>?> GetUserMaps(Guid userId);
+        Task<Guid?> AddUserMap(Guid userId, Guid mapId);
         Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points);
     }
 }

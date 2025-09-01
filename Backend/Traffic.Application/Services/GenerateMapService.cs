@@ -113,7 +113,6 @@ namespace Traffic.Application.Services
             var connectionsToRemove = new HashSet<(Guid, Guid)>();
             var allConnections = GetAllConnections(points);
 
-            // Проверяем все пары соединений на пересечение
             for (int i = 0; i < allConnections.Count; i++)
             {
                 var conn1 = allConnections[i];
@@ -122,17 +121,14 @@ namespace Traffic.Application.Services
                 {
                     var conn2 = allConnections[j];
 
-                    // Пропускаем, если соединения имеют общие точки
                     if (conn1.p1.Id == conn2.p1.Id || conn1.p1.Id == conn2.p2.Id ||
                         conn1.p2.Id == conn2.p1.Id || conn1.p2.Id == conn2.p2.Id)
                     {
                         continue;
                     }
 
-                    // Проверяем пересечение отрезков
                     if (DoLinesIntersect(conn1.p1, conn1.p2, conn2.p1, conn2.p2))
                     {
-                        // Удаляем более длинное соединение (или можно использовать другую логику)
                         double length1 = CalculateDistance(conn1.p1, conn1.p2);
                         double length2 = CalculateDistance(conn2.p1, conn2.p2);
 
@@ -148,7 +144,6 @@ namespace Traffic.Application.Services
                 }
             }
 
-            // Удаляем пересекающиеся соединения
             foreach (var point in points)
             {
                 var connections = point.ConnectedPoints.ToList();
@@ -180,7 +175,6 @@ namespace Traffic.Application.Services
                     var key1 = (point.Id, connectedPoint.Id);
                     var key2 = (connectedPoint.Id, point.Id);
 
-                    // Добавляем каждое соединение только один раз
                     if (!addedConnections.Contains(key1) && !addedConnections.Contains(key2))
                     {
                         connections.Add((point, connectedPoint));
@@ -194,30 +188,25 @@ namespace Traffic.Application.Services
 
         private static bool DoLinesIntersect(Point a1, Point a2, Point b1, Point b2)
         {
-            // Векторное произведение для проверки ориентации
             double Orientation(Point p, Point q, Point r)
             {
                 return (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
             }
 
-            // Проверка, лежит ли точка q на отрезке pr
             bool OnSegment(Point p, Point q, Point r)
             {
                 return q.X <= Math.Max(p.X, r.X) && q.X >= Math.Min(p.X, r.X) &&
                        q.Y <= Math.Max(p.Y, r.Y) && q.Y >= Math.Min(p.Y, r.Y);
             }
 
-            // Вычисляем ориентации для всех комбинаций
             double o1 = Orientation(a1, a2, b1);
             double o2 = Orientation(a1, a2, b2);
             double o3 = Orientation(b1, b2, a1);
             double o4 = Orientation(b1, b2, a2);
 
-            // Общий случай: отрезки пересекаются
             if (o1 * o2 < 0 && o3 * o4 < 0)
                 return true;
 
-            // Специальные случаи: коллинеарные точки
             if (o1 == 0 && OnSegment(a1, b1, a2)) return true;
             if (o2 == 0 && OnSegment(a1, b2, a2)) return true;
             if (o3 == 0 && OnSegment(b1, a1, b2)) return true;

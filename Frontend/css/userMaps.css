@@ -79,6 +79,9 @@
 
 .content-header h1 {
     color: #667eea;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin: 0;
 }
 
@@ -280,6 +283,11 @@
 .add-map-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.add-map-header {
+    color: #667eea;
+    text-align: center;
 }
 
 .add-map-btn i {

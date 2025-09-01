@@ -44,3 +44,26 @@ begin
 	return MapId;
 end;
 $$ language plpgsql;
+
+create or replace function select_user_maps(UserId uuid)
+returns table (
+	Id uuid,
+	Name varchar(100)
+) as $$
+begin
+	return query
+	select m.Id, m.Name from Maps m
+	join Users_Maps um on um.UserId = m.Id
+	where um.UserId = UserId;
+end;
+$$ language plpgsql;
+
+create or replace function add_user_map(CurrentUserId uuid, CurrentMapId uuid)
+returns uuid as $$
+begin
+	insert into Users_Maps (UserId, MapId)
+	values (CurrentUserId, CurrentMapId);
+
+	return UserId;
+end;
+$$ language plpgsql;

@@ -9,6 +9,8 @@ namespace Traffic.Core.Abstractions.Repositories
         Task<Guid?> UpdateAsync(Map map);
         Task<Guid?> DeleteAsync(Guid mapId);
         Task<Map?> GetMapPointsAsync(Guid mapId);
+        Task<List<Map>?> GetUserMap(Guid userId);
+        Task<Guid?> AddUserMap(Guid userId, Guid mapId);
         Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points);
     }
 }

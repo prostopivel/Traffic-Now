@@ -94,6 +94,12 @@ namespace Traffic.Data.Repositories
         public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)
         {
             var Error = string.Empty;
+            if (!points.Any())
+            {
+                Error = $"Точек нет!";
+                return (null, Error);
+            }
+
             var mapId = points?.First().MapId;
             if (mapId == null || await GetAsync((Guid)mapId) == null)
             {
@@ -114,7 +120,9 @@ namespace Traffic.Data.Repositories
                 const string connectSql = "SELECT connect_points(@PointLeftId, @PointRightId)";
                 foreach (var point in points)
                 {
-                    foreach (var connectedPoint in point?.ConnectedPoints ?? [])
+                    if (point == null)
+                        continue;
+                    foreach (var connectedPoint in point.ConnectedPoints ?? [])
                     {
                         await _connection.ExecuteScalarAsync<Guid>(connectSql, new
                         {

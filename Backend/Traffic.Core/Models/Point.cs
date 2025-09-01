@@ -16,6 +16,8 @@ namespace Traffic.Core.Models
 
         public string Name { get; set; } = string.Empty;
 
+        public List<Guid> ConnectedPointsIds { get; private set; } = new List<Guid>();
+
         public List<Point> ConnectedPoints { get; private set; } = new List<Point>();
 
         public Point()
@@ -36,12 +38,13 @@ namespace Traffic.Core.Models
             Name = pointEntity.Name;
         }
 
-        private Point(Guid id, Guid mapId, double x, double y)
+        private Point(Guid id, Guid mapId, double x, double y, string name)
         {
             Id = id;
             MapId = mapId;
             X = x;
             Y = y;
+            Name = name;
         }
 
         public void ConnectPoint(Point point)
@@ -52,10 +55,30 @@ namespace Traffic.Core.Models
             }
 
             ConnectedPoints.Add(point);
+            ConnectedPointsIds.Add(point.Id);
             point.ConnectPoint(this);
         }
 
-        public static (Point? point, string Error) Create(Guid id, Guid mapId, double x, double y)
+        public void DisconnectPoint(Guid id)
+        {
+            if (!ConnectedPointsIds.Contains(id))
+            {
+                return;
+            }
+
+            ConnectedPointsIds.Remove(id);
+            ConnectedPoints.Remove(ConnectedPoints.First(p => p.Id == id));
+        }
+
+        public void ConnectPoints(IEnumerable<Point> points)
+        {
+            foreach (var point in points)
+            {
+                ConnectPoint(point);
+            }
+        }
+
+        public static (Point? point, string Error) Create(Guid id, Guid mapId, double x, double y, string name = "")
         {
             var Error = string.Empty;
             Point? point = null;
@@ -66,7 +89,7 @@ namespace Traffic.Core.Models
             }
             else
             {
-                point = new Point(id, mapId, x, y);
+                point = new Point(id, mapId, x, y, name);
             }
 
             return (point, Error);

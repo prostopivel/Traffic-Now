@@ -26,15 +26,15 @@ namespace Traffic.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var user = await _userService.GetByEmailAsync(request.Username);
-            if (user == null)
-                return Unauthorized(new { message = "Неверный пароль!" });
+            if (user == null || user.Id == Guid.Empty)
+                return Unauthorized(new { message = "Пользователь не найден!" });
 
             var serverHash = HashPassword(request.Password, _configuration["Salt"]!);
 
             if (serverHash != user.Password)
-                return Unauthorized();
+                return Unauthorized(new { message = "Неверный пароль!" });
 
-            var tokenString = GenerateJwtToken(request);
+            var tokenString = GenerateJwtToken(user);
 
             return Ok(new { Token = tokenString });
         }
@@ -50,28 +50,33 @@ namespace Traffic.API.Controllers
                 serverHash,
                 false);
 
-            if (!string.IsNullOrEmpty(error))
+            if (!string.IsNullOrEmpty(error) || user == null)
                 return Unauthorized(error);
 
-            await _userService.CreateAsync(user!);
+            var Error = (await _userService.CreateAsync(user)).Error;
+            if (!string.IsNullOrEmpty(Error))
+            {
+                return Unauthorized(new { message = Error });
+            }
 
-            var tokenString = GenerateJwtToken(request);
+            var tokenString = GenerateJwtToken(user);
 
             return Ok(new { Token = tokenString });
         }
 
-        private string GenerateJwtToken(LoginRequest request)
+        private string GenerateJwtToken(Core.Models.User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, request.Username),
-                    new Claim(ClaimTypes.Role, "User")
-                }),
+                Subject = new ClaimsIdentity(
+                [
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
+                ]),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),

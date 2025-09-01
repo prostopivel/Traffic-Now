@@ -20,13 +20,13 @@
                 <a href="#" class="nav-item active">
                     <i class="fas fa-home"></i> Главная
                 </a>
-                <a href="#" class="nav-item" onclick="getProtectedData('/map', 'GET')">
+                <a href="#" class="nav-item" onclick="getProtectedData('map', 'GET', { id: '2ce75e6e-03a8-4ea7-8b16-125b56f5b13a' })">
                     <i class="fas fa-map"></i> Просмотр карты
                 </a>
-                <a href="#" class="nav-item" onclick="getProtectedData('/vehicles', 'GET')">
+                <a href="#" class="nav-item" onclick="getProtectedData('vehicles', 'GET')">
                     <i class="fas fa-bus"></i> Просмотр транспорта
                 </a>
-                <a href="#" class="nav-item" onclick="getProtectedData('/profile', 'GET')">
+                <a href="#" class="nav-item" onclick="getProtectedData('profile', 'GET')">
                     <i class="fas fa-user-cog"></i> Изменение информации
                 </a>
                 <a href="#" class="nav-item">
@@ -76,17 +76,17 @@
             
             <h2 style="margin-bottom: 10px;">Быстрые действия</h2>
             <div class="action-buttons">
-                <button class="action-btn" onclick="getProtectedData('/map', 'GET')">
+                <button class="action-btn" onclick="window.location.replace('map.html')">
                     <i class="fas fa-map-marked-alt"></i>
                     Просмотр карты
                 </button>
                 
-                <button class="action-btn" onclick="getProtectedData('/vehicles', 'GET')">
+                <button class="action-btn" onclick="getProtectedData('vehicles', 'GET')">
                     <i class="fas fa-bus"></i>
                     Просмотр транспорта
                 </button>
                 
-                <button class="action-btn" onclick="getProtectedData('/profile', 'GET')">
+                <button class="action-btn" onclick="getProtectedData('profile', 'GET')">
                     <i class="fas fa-user-edit"></i>
                     Изменить профиль
                 </button>
@@ -101,5 +101,6 @@
 
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/error.js"></script>
 </body>
 </html>

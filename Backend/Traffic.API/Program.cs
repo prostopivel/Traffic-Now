@@ -29,7 +29,7 @@ namespace Traffic.API
             builder.Services.AddPostgresDatabase(options =>
             {
                 options.WithConnectionString(connectionString)
-                    .WithInitializeDB(true);
+                    .WithInitializeDB(bool.Parse(builder.Configuration["InitDB"] ?? "false"));
             });
 
             var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!);

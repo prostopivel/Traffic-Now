@@ -68,6 +68,29 @@ namespace Traffic.Data.Repositories
             return result;
         }
 
+        public async Task<List<Map>?> GetUserMap(Guid userId)
+        {
+            const string sql = "SELECT * FROM select_user_maps(@UserId)";
+
+            var maps = await _connection.QueryAsync<MapEntity>(sql, new
+            {
+                UserId = userId
+            });
+
+            return [.. maps.Select(m => new Map(m))];
+        }
+
+        public async Task<Guid?> AddUserMap(Guid userId, Guid mapId)
+        {
+            const string sql = "SELECT add_user_map(@UserId, @MapId)";
+
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                UserId = userId,
+                MapId = mapId
+            });
+        }
+
         public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)
         {
             var Error = string.Empty;
@@ -95,7 +118,7 @@ namespace Traffic.Data.Repositories
                     {
                         await _connection.ExecuteScalarAsync<Guid>(connectSql, new
                         {
-                            PointLeftId = point.Id,
+                            PointLeftId = point?.Id,
                             PointRightId = connectedPoint.Id
                         });
                     }

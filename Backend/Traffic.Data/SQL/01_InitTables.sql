@@ -50,4 +50,12 @@ create table if not exists Routes_Points (
 	foreign key(PointId) references Points(Id) on delete cascade
 );
 
+create table if not exists Users_Maps (
+	UserId uuid,
+	MapId uuid,
+	primary key(UserId, MapId),
+	foreign key(UserId) references Users(Id) on delete cascade,
+	foreign key(MapId) references Maps(Id) on delete cascade
+);
+
 create index if not exists UserEmailIndex on Users (Email);

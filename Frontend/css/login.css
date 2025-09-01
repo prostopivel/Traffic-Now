@@ -118,6 +118,13 @@ body {
     display: none;
 }
 
+.email-issue {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 5px;
+    display: none;
+}
+
 @media (max-width: 480px) {
     .container {
         padding: 30px 20px;

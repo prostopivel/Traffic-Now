@@ -38,7 +38,7 @@ namespace Traffic.Data.Repositories
 
                 return (result, string.Empty);
             }
-            catch (PostgresException ex) when (ex.SqlState == "P0001" && ex.MessageText.Contains("already exists"))
+            catch (Exception ex) when (ex.Message.Contains("already exists"))
             {
                 return (null, $"Пользователь с почтой {user.Email} уже существует!");
             }

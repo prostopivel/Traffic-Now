@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficNow - Просмотр карты</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/map.css">
+    <!-- Иконочный шрифт для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="menu-container">
+        <!-- Боковое меню -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🚗 TrafficNow</h2>
+            </div>
+            <div class="nav-items">
+                <a href="menu.html" class="nav-item">
+                    <i class="fas fa-home"></i> Главная
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-map"></i> Просмотр карты
+                </a>
+                <a href="#" class="nav-item" onclick="getProtectedData('/vehicles', 'GET')">
+                    <i class="fas fa-bus"></i> Просмотр транспорта
+                </a>
+                <a href="#" class="nav-item" onclick="getProtectedData('/profile', 'GET')">
+                    <i class="fas fa-user-cog"></i> Изменение информации
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-history"></i> История поездок
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-line"></i> Аналитика
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i> Настройки
+                </a>
+            </div>
+        </div>
+        
+        <!-- Основной контент -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1><i class="fas fa-map-marked-alt"></i> Просмотр карты</h1>
+                <div class="header-actions">
+                    <button class="action-btn" onclick="refreshMap()">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                    <button class="action-btn" onclick="downloadMap()">
+                        <i class="fas fa-download"></i> Экспорт
+                    </button>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Панель управления картой -->
+            <div class="map-controls">
+                <button class="control-btn" onclick="toggleConnections()">
+                    <i class="fas fa-link"></i> Показать связи
+                </button>
+                <button class="control-btn" onclick="zoomIn()">
+                    <i class="fas fa-search-plus"></i> Увеличить
+                </button>
+                <button class="control-btn" onclick="zoomOut()">
+                    <i class="fas fa-search-minus"></i> Уменьшить
+                </button>
+            </div>
+            
+            <!-- Контейнер карты -->
+            <div class="map-container">
+                <div class="map-canvas" id="mapCanvas">
+                </div>
+            </div>
+            
+            <!-- Информационная панель -->
+            <div class="info-panel">
+                <h3><i class="fas fa-info-circle"></i> Информация о карте</h3>
+                <div class="point-info">
+                    <div class="info-item">
+                        <h4>Название карты</h4>
+                        <p id="mapName">Загрузка...</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Количество точек</h4>
+                        <p id="pointsCount">0</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Количество связей</h4>
+                        <p id="connectionsCount">0</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Статус</h4>
+                        <p id="mapStatus">Активна</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Точка</h4>
+                        <p id="pointInfo"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение скрипта авторизации -->
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/error.js"></script>
+</body>
+</html>

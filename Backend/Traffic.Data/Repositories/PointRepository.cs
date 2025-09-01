@@ -43,7 +43,7 @@ namespace Traffic.Data.Repositories
                 CurrentMapId = mapId
             });
 
-            return [.. result.Select(p => new Point(p))];
+            return [.. await ConnectPoints(result)];
         }
 
         public async Task<List<Point>?> GetRoutePointsAsync(Guid routeId)
@@ -54,7 +54,7 @@ namespace Traffic.Data.Repositories
                 CurrentRouteId = routeId
             });
 
-            return [.. result.Select(p => new Point(p))];
+            return [.. await ConnectPoints(result)];
         }
 
         public async Task<List<Point>?> GetConnectedPointsAsync(Guid pointId)
@@ -66,6 +66,21 @@ namespace Traffic.Data.Repositories
             });
 
             return [.. result.Select(p => new Point(p))];
+        }
+
+        private async Task<IEnumerable<Point>> ConnectPoints(IEnumerable<PointEntity> pointEntities)
+        {
+            var points = new List<Point>();
+
+            foreach (var p in pointEntities)
+            {
+                var point = new Point(p);
+                var connectedPoints = await GetConnectedPointsAsync(point.Id);
+                point.ConnectPoints(connectedPoints ?? []);
+                points.Add(point);
+            }
+
+            return points;
         }
     }
 }

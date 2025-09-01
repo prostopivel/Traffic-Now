@@ -28,6 +28,7 @@ async function login() {
             console.log('Login successful!');
             window.location.replace('menu.html');
         } else {
+            console.log('Login failed!');
             let errorMessage = 'Ошибка авторизации';
 
             try {
@@ -42,8 +43,17 @@ async function login() {
             if (response.status === 401 && errorMessage.includes('пароль')) {
                 const passwordIssue = document.getElementById('passwordIssue');
                 if (passwordIssue) {
+                    emailIssue.style.display = 'none';
                     passwordIssue.textContent = errorMessage;
                     passwordIssue.style.display = 'block';
+                    return;
+                }
+            } else if (response.status === 401 && errorMessage.includes('не найден')) {
+                const emailIssue = document.getElementById('emailIssue');
+                if (emailIssue) {
+                    passwordIssue.style.display = 'none';
+                    emailIssue.textContent = errorMessage;
+                    emailIssue.style.display = 'block';
                     return;
                 }
             }
@@ -51,7 +61,9 @@ async function login() {
             redirectToError(response.status, errorMessage, response.statusText);
         }
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Full error details:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
         redirectToError('0', 'Ошибка соединения с сервером', 'Network Error');
     }
 }
@@ -90,14 +102,32 @@ async function authorize() {
         } else {
             console.log('Authorize failed!');
 
-            if ([400, 401, 403, 404, 500].includes(response.status)) {
-                throw new Error(`HTTP ${response.status}`);
+            let errorMessage = 'Ошибка авторизации';
+
+            try {
+                const errorData = await response.json();
+                if (errorData && errorData.message) {
+                    errorMessage = errorData.message;
+                }
+            } catch (e) {
+                errorMessage = `Ошибка ${response.status}: ${response.statusText}`;
             }
 
-            throw new Error(`HTTP error! status: ${response.status}`);
+            if (response.status === 401 && errorMessage.includes('уже существует')) {
+                const emailIssue = document.getElementById('emailIssue');
+                if (emailIssue) {
+                    emailIssue.textContent = errorMessage;
+                    emailIssue.style.display = 'block';
+                    return;
+                }
+            }
+
+            redirectToError(response.status, errorMessage, response.statusText);
         }
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Full error details:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
         redirectToError('0', 'Ошибка соединения с сервером', 'Network Error');
     }
 }

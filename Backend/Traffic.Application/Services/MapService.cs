@@ -33,6 +33,11 @@ namespace Traffic.Application.Services
             return await _mapRepository.DeleteAsync(mapId);
         }
 
+        public async Task<List<Map>?> SearchMap(string name)
+        {
+            return await _mapRepository.SearchMap(name);
+        }
+
         public async Task<Map?> GetMapPointsAsync(Guid mapId)
         {
             return await _mapRepository.GetMapPointsAsync(mapId);

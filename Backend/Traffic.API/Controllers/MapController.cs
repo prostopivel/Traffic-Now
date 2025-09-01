@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Traffic.API.Contracts;
 using Traffic.Application.Services;
 using Traffic.Core.Abstractions.Services;
@@ -50,6 +51,7 @@ namespace Traffic.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetMap([FromQuery] Guid id)
         {
             var map = await _mapService.GetMapPointsAsync(id);
@@ -79,6 +81,36 @@ namespace Traffic.API.Controllers
             return Ok(mapResponse);
         }
 
+        [HttpGet("search")]
+        [Authorize]
+        public async Task<IActionResult> SearchMap([FromQuery] string name)
+        {
+            var maps = await _mapService.SearchMap(name);
+
+            var mapsResponse = new List<MapResponse>(maps?.Count ?? 0);
+            foreach (var map in maps ?? [])
+            {
+                var points = new List<PointResponse>(map.Points.Count);
+                foreach (var point in map?.Points ?? [])
+                {
+                    points.Add(new PointResponse(
+                        point.Id,
+                        point.MapId,
+                        point.X,
+                        point.Y,
+                        point.Name,
+                        point.ConnectedPointsIds));
+                }
+
+                mapsResponse.Add(new MapResponse(
+                map!.Id,
+                map.Name,
+                points));
+            }
+
+            return Ok(mapsResponse);
+        }
+
         [HttpPut("update")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateMap([FromBody] MapRequest request)
@@ -105,6 +137,61 @@ namespace Traffic.API.Controllers
             id = (Guid)await _mapService.DeleteAsync(id);
 
             return Ok(id);
+        }
+
+        [HttpGet("getMaps")]
+        [Authorize]
+        public async Task<IActionResult> GetUserMaps()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
+            {
+                return Unauthorized("Email not found in token");
+            }
+
+            var maps = await _mapService.GetUserMaps(id);
+
+            var mapsResponse = new List<MapResponse>(maps?.Count ?? 0);
+            foreach (var map in maps ?? [])
+            {
+                var points = new List<PointResponse>(map.Points.Count);
+                foreach (var point in map?.Points ?? [])
+                {
+                    points.Add(new PointResponse(
+                        point.Id,
+                        point.MapId,
+                        point.X,
+                        point.Y,
+                        point.Name,
+                        point.ConnectedPointsIds));
+                }
+
+                mapsResponse.Add(new MapResponse(
+                map!.Id,
+                map.Name,
+                points));
+            }
+
+            return Ok(mapsResponse);
+        }
+
+        [HttpPost("addUserMap")]
+        [Authorize]
+        public async Task<IActionResult> AddUserMap([FromQuery] Guid mapId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
+            {
+                return Unauthorized("Email not found in token");
+            }
+
+            var maps = await _mapService.GetUserMaps(id);
+
+            var resId = await _mapService.AddUserMap(id, mapId);
+
+            return Ok(resId);
         }
     }
 }

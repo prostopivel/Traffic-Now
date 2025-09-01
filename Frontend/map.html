@@ -12,39 +12,12 @@
 <body>
     <div class="menu-container">
         <!-- Боковое меню -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>🚗 TrafficNow</h2>
-            </div>
-            <div class="nav-items">
-                <a href="menu.html" class="nav-item">
-                    <i class="fas fa-home"></i> Главная
-                </a>
-                <a href="#" class="nav-item active">
-                    <i class="fas fa-map"></i> Просмотр карты
-                </a>
-                <a href="#" class="nav-item" onclick="getProtectedData('/vehicles', 'GET')">
-                    <i class="fas fa-bus"></i> Просмотр транспорта
-                </a>
-                <a href="#" class="nav-item" onclick="getProtectedData('/profile', 'GET')">
-                    <i class="fas fa-user-cog"></i> Изменение информации
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-history"></i> История поездок
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-chart-line"></i> Аналитика
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-cog"></i> Настройки
-                </a>
-            </div>
-        </div>
+        <div id="sidebar-container"></div>
         
         <!-- Основной контент -->
         <div class="main-content">
             <div class="content-header">
-                <h1><i class="fas fa-map-marked-alt"></i> Просмотр карты</h1>
+                <h1 class="title-map"><i class="fas fa-map-marked-alt"></i> Просмотр карты</h1>
                 <div class="header-actions">
                     <button class="action-btn" onclick="refreshMap()">
                         <i class="fas fa-sync-alt"></i> Обновить
@@ -107,9 +80,7 @@
     </div>
 
     <!-- Подключение скрипта авторизации -->
-    <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/map.js"></script>
-    <script src="js/error.js"></script>
 </body>
 </html>

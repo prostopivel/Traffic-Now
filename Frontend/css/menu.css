@@ -3,6 +3,8 @@
     display: flex;
     min-height: 100vh;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 100%;
+    max-width: 1050px;
 }
 
 /* Боковое меню */
@@ -54,6 +56,13 @@
     flex: 1;
     padding: 30px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 785px;
 }
 
 .content-header {
@@ -201,13 +210,5 @@
         flex-direction: column;
         gap: 15px;
         text-align: center;
-    }
-}
-
-/* Для очень широких экранов - ограничиваем ширину контента */
-@media (min-width: 1600px) {
-    .main-content {
-        max-width: 1400px;
-        margin: 0 auto;
     }
 }

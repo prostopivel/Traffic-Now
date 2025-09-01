@@ -34,8 +34,3 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('errorTitle').textContent = 'Произошла ошибка';
     }
 });
-
-function redirectToError(errorCode, errorMessage, errorStatus) {
-    const message = encodeURIComponent(errorMessage);
-    window.location.href = `error.html?code=${errorCode}&message=${message}&status=${errorStatus}`;
-}

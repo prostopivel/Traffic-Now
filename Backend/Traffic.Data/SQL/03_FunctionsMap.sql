@@ -1,12 +1,12 @@
-create or replace function select_map(MapId uuid)
+create or replace function select_map(CurrentMapId uuid)
 returns table(
-	Id uuid,
-	Name varchar(100)
+	MapId uuid,
+	MapName varchar(100)
 ) as $$
 begin
 	return query
 	select m.Id, m.Name from Maps m
-	where m.Id = MapId;
+	where m.Id = CurrentMapId;
 end;
 $$ language plpgsql;
 
@@ -45,16 +45,28 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function select_user_maps(UserId uuid)
+create or replace function search_map(CurrentMapName varchar(100))
 returns table (
-	Id uuid,
-	Name varchar(100)
+	MapId uuid,
+	MapName varchar(100)
 ) as $$
 begin
 	return query
 	select m.Id, m.Name from Maps m
-	join Users_Maps um on um.UserId = m.Id
-	where um.UserId = UserId;
+	where m.Name = CurrentMapName;
+end;
+$$ language plpgsql;
+
+create or replace function select_user_maps(CurrentUserId uuid)
+returns table (
+    MapId uuid,
+    MapName varchar(100)
+) as $$
+begin
+    return query
+    select m.Id, m.Name from Maps m
+    join Users_Maps um on um.MapId = m.Id
+    where um.UserId = CurrentUserId;
 end;
 $$ language plpgsql;
 
@@ -62,8 +74,11 @@ create or replace function add_user_map(CurrentUserId uuid, CurrentMapId uuid)
 returns uuid as $$
 begin
 	insert into Users_Maps (UserId, MapId)
-	values (CurrentUserId, CurrentMapId);
+	values (CurrentUserId, CurrentMapId)
+	on conflict (UserId, MapId) do nothing;
 
-	return UserId;
+	return CurrentUserId;
 end;
 $$ language plpgsql;
+
+select * from Users_Maps

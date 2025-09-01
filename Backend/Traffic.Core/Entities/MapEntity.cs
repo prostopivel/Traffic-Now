@@ -2,8 +2,8 @@
 {
     public class MapEntity
     {
-        public Guid Id { get; set; }
+        public Guid MapId { get; set; }
 
-        public string Name { get; set; } = string.Empty;
+        public string MapName { get; set; } = string.Empty;
     }
 }

@@ -8,6 +8,7 @@ namespace Traffic.Core.Abstractions.Repositories
         Task<Guid?> CreateAsync(Map map);
         Task<Guid?> UpdateAsync(Map map);
         Task<Guid?> DeleteAsync(Guid mapId);
+        Task<List<Map>?> SearchMap(string name);
         Task<Map?> GetMapPointsAsync(Guid mapId);
         Task<List<Map>?> GetUserMaps(Guid userId);
         Task<Guid?> AddUserMap(Guid userId, Guid mapId);

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Npgsql;
 using System.Data;
 using Traffic.Core.Abstractions.Repositories;
 using Traffic.Core.Entities;
@@ -58,6 +59,27 @@ namespace Traffic.Data.Repositories
             });
         }
 
+        public async Task<List<Map>?> SearchMap(string name)
+        {
+            const string sql = "SELECT * FROM search_map(@Name)";
+
+            var maps = await _connection.QueryAsync<MapEntity>(sql, new
+            {
+                Name = name
+            });
+
+            var result = new List<Map>(maps.Count());
+            foreach (var mapEntity in maps)
+            {
+                result.Add(new Map(mapEntity));
+
+                var pointsResult = await _pointRepository.GetMapPointsAsync(result.Last().Id);
+                pointsResult?.ForEach(p => result.Last().AddPoint(p));
+            }
+
+            return result;
+        }
+
         public async Task<Map?> GetMapPointsAsync(Guid mapId)
         {
             var result = await GetAsync(mapId);
@@ -77,18 +99,33 @@ namespace Traffic.Data.Repositories
                 UserId = userId
             });
 
-            return [.. maps.Select(m => new Map(m))];
+            var result = new List<Map>(maps.Count());
+            foreach (var mapEntity in maps)
+            {
+                result.Add(new Map(mapEntity));
+
+                var pointsResult = await _pointRepository.GetMapPointsAsync(result.Last().Id);
+                pointsResult?.ForEach(p => result.Last().AddPoint(p));
+            }
+
+            return result;
         }
 
         public async Task<Guid?> AddUserMap(Guid userId, Guid mapId)
         {
-            const string sql = "SELECT add_user_map(@UserId, @MapId)";
-
-            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            try
             {
-                UserId = userId,
-                MapId = mapId
-            });
+                const string sql = "SELECT add_user_map(@UserId, @MapId)";
+                return await _connection.ExecuteScalarAsync<Guid>(sql, new
+                {
+                    UserId = userId,
+                    MapId = mapId
+                });
+            }
+            catch (PostgresException ex) when (ex.SqlState == "23505")
+            {
+                return Guid.Empty;
+            }
         }
 
         public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)

@@ -21,8 +21,8 @@ namespace Traffic.Core.Models
                 return;
             }
 
-            Id = mapEntity.Id;
-            Name = mapEntity.Name;
+            Id = mapEntity.MapId;
+            Name = mapEntity.MapName;
         }
 
         private Map(Guid id, string name, List<Point> points)

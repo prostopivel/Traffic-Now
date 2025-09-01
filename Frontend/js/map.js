@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 async function loadMapData() {
     try {
-        const map = await getProtectedData('map', 'GET', { id: '994dd613-fdb9-42b9-9ad5-d0c254464729' });
+        const mapId = localStorage.getItem('map');
+        const map = await getProtectedData('map', 'GET', { id: mapId });
         renderMap(map);
     } catch (error) {
         console.error('Ошибка загрузки карты:', error);
@@ -74,10 +75,10 @@ function renderConnections(points, container) {
                 const connection = document.createElement('div');
                 connection.className = 'connection-line';
 
-                const x1 = (point.x / 100) * containerWidth;
-                const y1 = (point.y / 100) * containerHeight;
-                const x2 = (connectedPoint.x / 100) * containerWidth;
-                const y2 = (connectedPoint.y / 100) * containerHeight;
+                const x1 = (point.x / 100) * containerWidth / currentZoom;
+                const y1 = (point.y / 100) * containerHeight / currentZoom;
+                const x2 = (connectedPoint.x / 100) * containerWidth / currentZoom;
+                const y2 = (connectedPoint.y / 100) * containerHeight / currentZoom;
 
                 const deltaX = x2 - x1;
                 const deltaY = y2 - y1;

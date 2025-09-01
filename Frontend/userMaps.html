@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficNow - Управление картами</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/userMaps.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="menu-container">
+        <!-- Боковое меню заполняется js в utils.js -->
+        <div id="sidebar-container"></div>
+
+        <!-- Основной контент -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Управление картами</h1>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </button>
+            </div>
+
+            <div class="maps-grid" id="mapsContainer">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Загрузка карт...</p>
+                </div>
+            </div>
+
+            <div class="add-map-container">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="mapSearch" placeholder="Поиск карты по названию..."
+                            oninput="searchMaps()">
+                        <button class="clear-search" onclick="clearSearch()" title="Очистить поиск">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/userMaps.js"></script>
+</body>
+
+</html>

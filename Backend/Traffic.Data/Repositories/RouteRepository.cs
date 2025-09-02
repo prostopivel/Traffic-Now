@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data;
+using System.Text;
 using Traffic.Core.Abstractions.Repositories;
 using Traffic.Core.Entities;
 using Traffic.Core.Models;
@@ -9,11 +10,13 @@ namespace Traffic.Data.Repositories
     public class RouteRepository : RepositoryBase, IRouteRepository
     {
         private readonly IPointRepository _pointRepository;
+        private readonly ITransportRepository _transportRepository;
 
-        public RouteRepository(IDbConnection connection, IPointRepository pointRepository)
+        public RouteRepository(IDbConnection connection, IPointRepository pointRepository, ITransportRepository transportRepository)
             : base(connection)
         {
             _pointRepository = pointRepository;
+            _transportRepository = transportRepository;
         }
 
         public async Task<Route?> GetAsync(Guid routeId)
@@ -27,7 +30,7 @@ namespace Traffic.Data.Repositories
             return new Route(result.FirstOrDefault());
         }
 
-        public async Task<Guid?> CreateAsync(Route route, IEnumerable<Point> points)
+        public async Task<Guid?> CreateAsync(Route route)
         {
             const string sql = "SELECT create_route(@Id, @TransportId)";
             await _connection.ExecuteScalarAsync<Guid>(sql, new
@@ -37,17 +40,19 @@ namespace Traffic.Data.Repositories
                 route.RouteTime
             });
 
-            const string pointsSql = "SELECT create_route_points(@CurrentRouteId, @CurrentPointId)";
-            foreach (var point in points)
-            {
-                await _connection.ExecuteScalarAsync<Guid>(pointsSql, new
-                {
-                    CurrentRouteId = route.Id,
-                    CurrentPointId = point.Id
-                });
-            }
-
             return route.Id;
+        }
+
+        public async Task<Guid?> AddRoutePointAsync(Guid routeId, Guid pointId)
+        {
+            const string pointsSql = "SELECT create_route_points(@CurrentRouteId, @CurrentPointId)";
+            await _connection.ExecuteScalarAsync<Guid>(pointsSql, new
+            {
+                CurrentRouteId = routeId,
+                CurrentPointId = pointId
+            });
+
+            return routeId;
         }
 
         public async Task<Route?> GetRoutePointsAsync(Guid routeId)
@@ -63,18 +68,30 @@ namespace Traffic.Data.Repositories
             var result = new Route(routeResult.FirstOrDefault());
             result.EnqueuePoints(pointsResult ?? []);
 
+            var transportResult = await _transportRepository.GetAsync(result.TransportId);
+            result.Transport = transportResult ?? default!;
+
             return result;
         }
 
         public async Task<List<Route>?> GetUserRoutesAsync(Guid userId)
         {
             const string sql = "SELECT * FROM select_user_routes(@CurrentUserId)";
-            var result = (await _connection.QueryAsync<RouteEntity>(sql, new
+            var routesResult = (await _connection.QueryAsync<RouteEntity>(sql, new
             {
                 CurrentUserId = userId
             }));
 
-            return [.. result.Select(r => new Route(r))];
+            var result = new List<Route>(routesResult.Count());
+            foreach (var route in routesResult)
+            {
+                var pointsResult = await _pointRepository.GetRoutePointsAsync(route.Id);
+
+                result.Add(new Route(route));
+                result.Last().EnqueuePoints(pointsResult ?? []);
+            }
+
+            return result;
         }
     }
 }

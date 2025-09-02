@@ -8,18 +8,25 @@ namespace Traffic.Data.Repositories
 {
     public class TransportRepository : RepositoryBase, ITransportRepository
     {
-        public TransportRepository(IDbConnection connection) : base(connection)
-        { }
+        private readonly IPointRepository _pointRepository;
+
+        public TransportRepository(IDbConnection connection, IPointRepository pointRepository) : base(connection)
+        {
+            _pointRepository = pointRepository;
+        }
 
         public async Task<Transport?> GetAsync(Guid transportId)
         {
             const string sql = "SELECT * FROM select_transport(@TransportId)";
-            var result = await _connection.QueryAsync<TransportEntity>(sql, new
+            var transportResult = await _connection.QueryAsync<TransportEntity>(sql, new
             {
                 TransportId = transportId
             });
 
-            return new Transport(result.FirstOrDefault());
+            var result = transportResult.FirstOrDefault();
+            var pointResult = await _pointRepository.GetAsync(result?.PointId ?? Guid.Empty);
+
+            return new Transport();
         }
 
         public async Task<Guid?> CreateAsync(Transport transport)

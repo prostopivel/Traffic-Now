@@ -22,12 +22,9 @@ namespace Traffic.API.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateMap([FromBody] string name)
+        public async Task<IActionResult> CreateMap([FromBody] MapRequest mapRequest)
         {
-            (var map, var Error) = Map.Create(
-                Guid.NewGuid(),
-                name,
-                []);
+            (var map, var Error) = ContractsFactory.CreateMap(mapRequest);
             if (!string.IsNullOrEmpty(Error) || map == null)
             {
                 return BadRequest(new { message = Error });
@@ -61,22 +58,7 @@ namespace Traffic.API.Controllers
                 return NotFound(new { message = "Карта не найдена!" });
             }
 
-            var points = new List<PointResponse>(map.Points.Count);
-            foreach (var point in map?.Points ?? [])
-            {
-                points.Add(new PointResponse(
-                    point.Id,
-                    point.MapId,
-                    point.X,
-                    point.Y,
-                    point.Name,
-                    point.ConnectedPointsIds));
-            }
-
-            var mapResponse = new MapResponse(
-                map!.Id,
-                map.Name,
-                points);
+            var mapResponse = ContractsFactory.CreateMapResponse(map);
 
             return Ok(mapResponse);
         }
@@ -90,22 +72,7 @@ namespace Traffic.API.Controllers
             var mapsResponse = new List<MapResponse>(maps?.Count ?? 0);
             foreach (var map in maps ?? [])
             {
-                var points = new List<PointResponse>(map.Points.Count);
-                foreach (var point in map?.Points ?? [])
-                {
-                    points.Add(new PointResponse(
-                        point.Id,
-                        point.MapId,
-                        point.X,
-                        point.Y,
-                        point.Name,
-                        point.ConnectedPointsIds));
-                }
-
-                mapsResponse.Add(new MapResponse(
-                map!.Id,
-                map.Name,
-                points));
+                mapsResponse.Add(ContractsFactory.CreateMapResponse(map));
             }
 
             return Ok(mapsResponse);
@@ -115,10 +82,7 @@ namespace Traffic.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateMap([FromBody] MapRequest request)
         {
-            (var map, var Error) = Map.Create(
-                request.Id,
-                request.Name,
-                []);
+            (var map, var Error) = ContractsFactory.CreateMap(request);
 
             if (string.IsNullOrEmpty(Error) || map == null)
             {
@@ -147,7 +111,7 @@ namespace Traffic.API.Controllers
 
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
             {
-                return Unauthorized("Email not found in token");
+                return Unauthorized("Id not found in token");
             }
 
             var maps = await _mapService.GetUserMaps(id);
@@ -155,22 +119,7 @@ namespace Traffic.API.Controllers
             var mapsResponse = new List<MapResponse>(maps?.Count ?? 0);
             foreach (var map in maps ?? [])
             {
-                var points = new List<PointResponse>(map.Points.Count);
-                foreach (var point in map?.Points ?? [])
-                {
-                    points.Add(new PointResponse(
-                        point.Id,
-                        point.MapId,
-                        point.X,
-                        point.Y,
-                        point.Name,
-                        point.ConnectedPointsIds));
-                }
-
-                mapsResponse.Add(new MapResponse(
-                map!.Id,
-                map.Name,
-                points));
+                mapsResponse.Add(ContractsFactory.CreateMapResponse(map));
             }
 
             return Ok(mapsResponse);
@@ -184,7 +133,7 @@ namespace Traffic.API.Controllers
 
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
             {
-                return Unauthorized("Email not found in token");
+                return Unauthorized("Id not found in token");
             }
 
             var maps = await _mapService.GetUserMaps(id);

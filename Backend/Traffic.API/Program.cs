@@ -55,6 +55,7 @@ namespace Traffic.API
             ConfigureCors(builder);
             ConfigureRepositories(builder);
             ConfigureRepositoryServices(builder);
+            builder.Services.AddScoped<IMapSerializeService, MapSerializeService>();
 
             builder.Services.AddAuthorization();
 

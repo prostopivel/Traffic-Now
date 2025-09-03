@@ -14,10 +14,12 @@ namespace Traffic.API.Controllers
     public class MapController : ControllerBase
     {
         private readonly IMapService _mapService;
+        private readonly IMapSerializeService _mapSerializeService;
 
-        public MapController(IMapService mapService)
+        public MapController(IMapService mapService, IMapSerializeService mapSerializeService)
         {
             _mapService = mapService;
+            _mapSerializeService = mapSerializeService;
         }
 
         [HttpPost("create")]
@@ -192,6 +194,15 @@ namespace Traffic.API.Controllers
             var resId = await _mapService.AddUserMap(id, mapId);
 
             return Ok(resId);
+        }
+
+        [HttpPost("saveMap")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SaveMapToJsonAsync([FromQuery] string path, [FromQuery] Guid mapId)
+        {
+            var id = await _mapSerializeService.CreateMapJson(path, mapId);
+
+            return Ok(id);
         }
     }
 }

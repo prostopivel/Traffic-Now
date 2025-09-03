@@ -1,48 +1,7 @@
-create or replace function select_route(RouteId uuid)
+create or replace function select_point(PointId uuid)
 returns table (
 	Id uuid,
-	TransportId uuid,
-	RouteTime timestamp
-) as $$
-begin
-	return query
-	select r.Id, r.TransportId, r.RouteTime from Routes r
-	where r.Id = RouteId;
-end;
-$$ language plpgsql;
-
-create or replace function select_user_routes(CurrentUserId uuid)
-returns table (
-	Id uuid,
-	TransportId uuid,
-	RouteTime timestamp
-) as $$
-begin
-	return query 
-	select r.Id, r.TransportId, r.RouteTime from Routes r
-	join Transport t on t.Id = r.TransportId
-	join Users u on u.Id = t.UserId
-	where t.UserId = CurrentUserId;
-end;
-$$ language plpgsql;
-
-create or replace function create_route(
-	RouteId uuid,
-	RouteTransportId uuid,
-	RouteRouteTime timestamp)
-returns uuid as $$
-begin
-	insert into Routes (Id, TransportId, RouteTime)
-	values (RouteId, RouteTransportId, RouteRouteTime);
-
-	return RouteId;
-end;
-$$ language plpgsql;
-
-create or replace function select_route_points(CurrentRouteId uuid)
-returns table (
-	Id uuid,
-	RouteId uuid,
+	MapId uuid,
 	X double precision,
 	Y double precision,
 	Name varchar(100)
@@ -50,17 +9,65 @@ returns table (
 begin
 	return query
 	select p.Id, p.MapId, p.X, p.Y, p.Name from Points p
-	join Routes_Points rp on rp.PointId = p.Id
-	where rp.RouteId = CurrentRouteId;
+	where p.Id = PointId;
 end;
 $$ language plpgsql;
 
-create or replace function create_route_points(CurrentRouteId uuid, CurrentPointId uuid)
+create or replace function create_point(
+	PointId uuid,
+	PointMapId uuid,
+	PointX double precision,
+	PointY double precision,
+	PointName varchar(100))
 returns uuid as $$
 begin
-	insert into Routes_Points (RouteId, PointId)
-	values (CurrentRouteId, CurrentPointId);
+	insert into Points (Id, MapId, X, Y, Name)
+	values (PointId, PointMapId, PointX, PointY, PointName);
 
-	return CurrentRouteId;
+	return PointId;
+end;
+$$ language plpgsql;
+
+create or replace function select_map_points(CurrentMapId uuid)
+returns table (
+	Id uuid,
+	MapId uuid,
+	X double precision,
+	Y double precision,
+	Name varchar(100)
+) as $$
+begin
+	return query
+	select p.Id, p.MapId, p.X, p.Y, p.Name from Points p
+	where p.MapId = CurrentMapId;
+end;
+$$ language plpgsql;
+
+create or replace function select_connected_points(PointId uuid)
+returns table (
+	Id uuid,
+	MapId uuid,
+	X double precision,
+	Y double precision,
+	Name varchar(100)
+) as $$
+begin
+	return query
+	select distinct p.Id, p.MapId, p.X, p.Y, p.Name from Points p
+    join Points_Points pp on p.Id = pp.RightId
+    where pp.LeftId = PointId;
+end;
+$$ language plpgsql;
+
+create or replace function connect_points(
+	PointLeftId uuid,
+	PointRightId uuid
+)
+returns uuid as $$
+begin
+	insert into Points_Points (LeftId, RightId)
+	values (PointLeftId, PointRightId);
+
+	return PointLeftId;
 end;
 $$ language plpgsql;

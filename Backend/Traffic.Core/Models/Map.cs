@@ -2,6 +2,7 @@
 
 namespace Traffic.Core.Models
 {
+    [Serializable]
     public class Map
     {
         public Guid Id { get; }

@@ -1,4 +1,6 @@
 ﻿using Traffic.Core.Entities;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Traffic.Core.Models
 {
@@ -6,18 +8,22 @@ namespace Traffic.Core.Models
     {
         public Guid Id { get; }
 
+        [JsonIgnore]
         public Guid MapId { get; }
 
+        [JsonIgnore]
         public Map Map { get; set; }
 
         public double X { get; }
 
         public double Y { get; }
 
+        [JsonIgnore]
         public string Name { get; set; } = string.Empty;
 
         public List<Guid> ConnectedPointsIds { get; private set; } = new List<Guid>();
 
+        [JsonIgnore]
         public List<Point> ConnectedPoints { get; private set; } = new List<Point>();
 
         public Point()

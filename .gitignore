@@ -116,6 +116,9 @@ coverage.xml
 *.coverage
 *.codecoverage
 
+#Мои файлы
+Maps/
+
 # Файлы миграций Entity Framework (если не нужны в репозитории)
 # **/Migrations/*.Designer.cs
 # **/Migrations/*.sql

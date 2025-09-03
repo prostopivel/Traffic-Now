@@ -1,6 +1,7 @@
 ﻿using Traffic.Core.Abstractions.Repositories;
 using Traffic.Core.Abstractions.Services;
 using Traffic.Core.Models;
+using Traffic.Data.Repositories;
 
 namespace Traffic.Application.Services
 {
@@ -18,9 +19,14 @@ namespace Traffic.Application.Services
             return await _routeRepository.GetAsync(routeId);
         }
 
-        public async Task<Guid?> CreateAsync(Route route, IEnumerable<Point> points)
+        public async Task<Guid?> CreateAsync(Route route)
         {
-            return await _routeRepository.CreateAsync(route, points);
+            return await _routeRepository.CreateAsync(route);
+        }
+
+        public async Task<Guid?> AddRoutePointAsync(Guid pointId, Guid routeId)
+        {
+            return await _routeRepository.AddRoutePointAsync(pointId, routeId);
         }
 
         public async Task<Route?> GetRoutePointsAsync(Guid routeId)

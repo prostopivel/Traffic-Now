@@ -71,25 +71,25 @@ function createSidebar() {
                 <h2>🚗 TrafficNow</h2>
             </div>
             <div class="nav-items">
-                <a href="menu.html" class="nav-item active">
+                <a href="menu.html" id="nav-menu" class="nav-item">
                     <i class="fas fa-home"></i> Главная
                 </a>
-                <a href="userMaps.html" class="nav-item">
-                    <i class="fas fa-map"></i> Просмотр карты
+                <a href="userMaps.html" id="nav-maps" class="nav-item">
+                    <i class="fas fa-map"></i> Мои карты
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#" id="nav-transport" class="nav-item">
                     <i class="fas fa-bus"></i> Просмотр транспорта
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#" id="nav-profile" class="nav-item">
                     <i class="fas fa-user-cog"></i> Изменение информации
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#" id="nav-history" class="nav-item">
                     <i class="fas fa-history"></i> История поездок
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#" id="nav-analytics" class="nav-item">
                     <i class="fas fa-chart-line"></i> Аналитика
                 </a>
-                <a href="#" class="nav-item">
+                <a href="#" id="nav-settings" class="nav-item">
                     <i class="fas fa-cog"></i> Настройки
                 </a>
             </div>
@@ -100,6 +100,47 @@ function createSidebar() {
     if (container) {
         container.innerHTML = sidebarHTML;
         applySidebarStyles();
+        setActiveNavItem();
+    }
+}
+
+function setActiveNavItem() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const pageTitle = document.title.toLowerCase();
+    
+    let activeNavId = '';
+    
+    if (currentPage === 'menu.html' || pageTitle.includes('панель') || pageTitle.includes('главная')) {
+        activeNavId = 'nav-menu';
+    } else if (currentPage === 'userMaps.html' || currentPage === 'map.html' || pageTitle.includes('карт') || pageTitle.includes('map')) {
+        activeNavId = 'nav-maps';
+    } else if (pageTitle.includes('транспорт') || pageTitle.includes('transport') || pageTitle.includes('bus')) {
+        activeNavId = 'nav-transport';
+    } else if (pageTitle.includes('профиль') || pageTitle.includes('profile') || pageTitle.includes('информация')) {
+        activeNavId = 'nav-profile';
+    } else if (pageTitle.includes('история') || pageTitle.includes('history')) {
+        activeNavId = 'nav-history';
+    } else if (pageTitle.includes('аналитика') || pageTitle.includes('analytics') || pageTitle.includes('chart')) {
+        activeNavId = 'nav-analytics';
+    } else if (pageTitle.includes('настройк') || pageTitle.includes('settings') || pageTitle.includes('cog')) {
+        activeNavId = 'nav-settings';
+    }
+    
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    if (activeNavId) {
+        const activeNav = document.getElementById(activeNavId);
+        if (activeNav) {
+            activeNav.classList.add('active');
+            
+            const icon = activeNav.querySelector('i');
+            if (icon) {
+                icon.style.color = '#667eea';
+            }
+        }
     }
 }
 
@@ -126,6 +167,22 @@ function applySidebarStyles() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', createSidebar);
+document.addEventListener('DOMContentLoaded', function() {
+    createSidebar();
+});
 
 window.addEventListener('resize', applySidebarStyles);
+
+let lastTitle = document.title;
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'title') {
+            setActiveNavItem();
+        }
+    });
+});
+
+observer.observe(document.querySelector('title'), { 
+    attributes: true,
+    attributeFilter: ['title']
+});

@@ -26,11 +26,10 @@ namespace Traffic.Core.Models
             Name = mapEntity.MapName;
         }
 
-        private Map(Guid id, string name, List<Point> points)
+        private Map(Guid id, string name)
         {
             Id = id;
             Name = name;
-            Points = points;
         }
 
         public void AddPoint(Point point)
@@ -38,10 +37,10 @@ namespace Traffic.Core.Models
             Points.Add(point);
         }
 
-        public static (Map? map, string Error) Create(Guid id, string name, List<Point> points)
+        public static (Map? map, string Error) Create(Guid id, string name)
         {
             var Error = string.Empty;
-            var map = new Map(id, name, points);
+            var map = new Map(id, name);
 
             return (map, Error);
         }

@@ -1,4 +1,6 @@
-﻿namespace Traffic.API.Contracts
+﻿using Traffic.Core.Models;
+
+namespace Traffic.API.Contracts
 {
     public record MapResponse(
         Guid Id,

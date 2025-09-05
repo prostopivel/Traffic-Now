@@ -7,4 +7,9 @@
         double Y,
         string Name,
         List<Guid> ConnectedPointsIds);
+
+    public record PointTransportResponse(
+        Guid TransportId,
+        double X,
+        double Y);
 }

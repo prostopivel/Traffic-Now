@@ -42,9 +42,17 @@ namespace Traffic.API.Contracts
             return mapResponse;
         }
 
-        public static (Transport?, string Error) CreateTransport(Transport transportRequest)
+        public static (Transport?, string Error) CreateTransport(TransportJsonResponse transportResponse, Guid userId, string url)
         {
-            return (null, string.Empty);
+            (var transport, var Error) = Transport.Create(
+                transportResponse.Id,
+                userId,
+                transportResponse.PointId,
+                url,
+                transportResponse.X,
+                transportResponse.Y);
+
+            return (transport, Error);
         }
 
         public static TransportResponse CreateTransportResponse(Transport transport)
@@ -55,9 +63,9 @@ namespace Traffic.API.Contracts
                 transport.Id,
                 transport.UserId,
                 transport.PointId,
+                transport.Url,
                 pointResponse,
-                transport.X,
-                transport.Y);
+                transport.IsActive);
 
             return transportResponse;
         }

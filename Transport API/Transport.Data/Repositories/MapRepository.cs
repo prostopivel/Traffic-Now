@@ -13,7 +13,7 @@ namespace Transport.Data.Repositories
         public MapRepository(IConfiguration configuration)
         {
             _path = string.IsNullOrEmpty(configuration["MapPath"])
-                ? AppContext.BaseDirectory + "\\Files"
+                ? Path.GetDirectoryName(Environment.ProcessPath)! + "\\Files"
                 : configuration["MapPath"]!;
 
             if (!Directory.Exists(_path))
@@ -21,9 +21,16 @@ namespace Transport.Data.Repositories
                 Directory.CreateDirectory(_path);
             }
 
-            _path = Directory.GetFiles(_path)
-                .Where(f => f.Split('\\').Last().StartsWith("map_"))
-                .First();
+            try
+            {
+                _path = Directory.GetFiles(_path)
+                    .Where(f => f.Split('\\').Last().StartsWith("map_"))
+                    .First();
+            }
+            catch
+            {
+                throw new FileNotFoundException($"Нужен файл карты в директории '{_path}'");
+            }
         }
 
         public Map GetMap()

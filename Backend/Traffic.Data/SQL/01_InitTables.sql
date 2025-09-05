@@ -23,6 +23,7 @@ create table if not exists Transport (
 	Id uuid PRIMARY KEY,
 	UserId uuid,
 	PointId uuid,
+	Url varchar(100),
 	foreign key(UserId) references Users(Id) on delete cascade,
 	foreign key(PointId) references Points(Id) on delete cascade
 );

@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Transport.Application.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using Transport.Core.Abstractions;
 
 namespace Transport.API.Controllers
 {
@@ -8,9 +7,9 @@ namespace Transport.API.Controllers
     [Route("api/[controller]")]
     public class TransportController : ControllerBase
     {
-        private readonly DataService _dataService;
+        private readonly IDataService _dataService;
 
-        public TransportController(DataService dataService)
+        public TransportController(IDataService dataService)
         {
             _dataService = dataService;
         }

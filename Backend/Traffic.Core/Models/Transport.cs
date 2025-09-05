@@ -12,6 +12,10 @@ namespace Traffic.Core.Models
 
         public Point Point { get; set; }
 
+        public bool IsActive { get; set; } = false;
+
+        public string Url { get; set; }
+
         public double X { get; set; }
 
         public double Y { get; set; }
@@ -30,18 +34,20 @@ namespace Traffic.Core.Models
             Id = transportEntity.Id;
             UserId = transportEntity.UserId;
             PointId = transportEntity.PointId;
+            Url = transportEntity.Url;
         }
 
-        private Transport(Guid id, Guid userId, Guid pointId, double startX, double startY)
+        private Transport(Guid id, Guid userId, Guid pointId, string url, double startX, double startY)
         {
             Id = id;
             UserId = userId;
             PointId = pointId;
+            Url = url;
             X = startX;
             Y = startY;
         }
 
-        public static (Transport? transport, string Error) Create(Guid id, Guid userId, Guid pointId, double startX, double startY)
+        public static (Transport? transport, string Error) Create(Guid id, Guid userId, Guid pointId, string url, double startX, double startY)
         {
             var Error = string.Empty;
             Transport? transport = null;
@@ -52,7 +58,7 @@ namespace Traffic.Core.Models
             }
             else
             {
-                transport = new Transport(id, userId, pointId, startX, startY);
+                transport = new Transport(id, userId, pointId, url, startX, startY);
             }
 
             return (transport, Error);

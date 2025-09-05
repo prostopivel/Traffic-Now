@@ -6,4 +6,8 @@
         TransportResponse Transport,
         DateTime RouteTime,
         List<PointResponse> Points);
+
+    public record RouteRequest(
+        Guid TransportId,
+        DateTime RouteTime);
 }

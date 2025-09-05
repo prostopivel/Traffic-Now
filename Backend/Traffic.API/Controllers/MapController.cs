@@ -71,7 +71,7 @@ namespace Traffic.API.Controllers
         {
             var maps = await _mapService.SearchMap(name);
 
-            var mapsResponse = new List<MapResponse>(maps?.Count ?? 0);
+            var mapsResponse = new List<Contracts.MapResponse>(maps?.Count ?? 0);
             foreach (var map in maps ?? [])
             {
                 mapsResponse.Add(ContractsFactory.CreateMapResponse(map));
@@ -80,7 +80,7 @@ namespace Traffic.API.Controllers
             return Ok(mapsResponse);
         }
 
-        [HttpPut("update")]
+        [HttpPut]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateMap([FromBody] MapRequest request)
         {
@@ -113,12 +113,12 @@ namespace Traffic.API.Controllers
 
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
             {
-                return Unauthorized("Id not found in token");
+                return Unauthorized(new { message = "Идентификатор не найден в токене" });
             }
 
             var maps = await _mapService.GetUserMaps(id);
 
-            var mapsResponse = new List<MapResponse>(maps?.Count ?? 0);
+            var mapsResponse = new List<Contracts.MapResponse>(maps?.Count ?? 0);
             foreach (var map in maps ?? [])
             {
                 mapsResponse.Add(ContractsFactory.CreateMapResponse(map));
@@ -135,7 +135,7 @@ namespace Traffic.API.Controllers
 
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
             {
-                return Unauthorized("Id not found in token");
+                return Unauthorized(new { message = "Идентификатор не найден в токене" });
             }
 
             var maps = await _mapService.GetUserMaps(id);

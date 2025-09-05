@@ -6,5 +6,6 @@ namespace Transport.Core.Abstractions
     {
         Map Map { get; set; }
         Models.Transport Transport { get; set; }
+        bool IsActive { get; set; }
     }
 }

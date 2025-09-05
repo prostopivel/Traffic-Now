@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Traffic.API.APIServices;
+using Traffic.API.Services;
 using Traffic.Application.Services;
 using Traffic.Core.Abstractions.Repositories;
 using Traffic.Core.Abstractions.Services;
@@ -25,6 +26,7 @@ namespace Traffic.API
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddSingleton(connectionString);
+            builder.Services.AddSingleton<ITransportAPIConnection, TransportAPIConnection>();
 
             builder.Services.AddPostgresDatabase(options =>
             {
@@ -32,30 +34,13 @@ namespace Traffic.API
                     .WithInitializeDB(bool.Parse(builder.Configuration["InitDB"] ?? "false"));
             });
 
-            var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!);
-
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-
+            ConfigureAuthorization(builder);
             ConfigureCors(builder);
             ConfigureRepositories(builder);
             ConfigureRepositoryServices(builder);
             builder.Services.AddScoped<IMapSerializeService, MapSerializeService>();
+            builder.Services.AddScoped<ITransportHttpConnection, TransportHttpConnection>();
+            builder.Services.AddScoped<IConnectionTransportService, ConnectionTransportService>();
 
             builder.Services.AddAuthorization();
 
@@ -106,6 +91,29 @@ namespace Traffic.API
             builder.Services.AddScoped<IMapService, MapService>();
             builder.Services.AddScoped<ITransportService, TransportService>();
             builder.Services.AddScoped<IRouteService, RouteService>();
+        }
+
+        private static void ConfigureAuthorization(WebApplicationBuilder builder)
+        {
+            var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!);
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
         }
     }
 }

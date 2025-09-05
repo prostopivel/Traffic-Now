@@ -1,7 +1,6 @@
 ﻿using Traffic.Core.Abstractions.Repositories;
 using Traffic.Core.Abstractions.Services;
 using Traffic.Core.Models;
-using Traffic.Data.Repositories;
 
 namespace Traffic.Application.Services
 {

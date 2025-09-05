@@ -6,13 +6,13 @@ namespace Transport.API.Services
 {
     public class TransportHostService : BackgroundService
     {
-        private const int MIN_WAIT_MINUTES = 1, MAX_WAIT_MINUTES = 2;
+        private const int MIN_WAIT_MINUTES = 2, MAX_WAIT_MINUTES = 3;
         private const double COORDINATE_SCALE = 100.0;
         private readonly IRouteService _routeService;
         private readonly IDataService _dataService;
         private readonly ILogger<TransportHostService> _logger;
 
-        private DateTime _nextRouteTime = default;
+        private DateTime _nextRouteTime;
         private Point? _currentTargetPoint = null;
         private Point? _previousPoint = null;
         private double _progressToTarget = 0;
@@ -22,6 +22,10 @@ namespace Transport.API.Services
             _routeService = routeService;
             _dataService = dataService;
             _logger = logger;
+
+            var random = new Random();
+            _nextRouteTime = DateTime.Now.AddSeconds(
+                random.Next(0, 120));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -59,6 +63,7 @@ namespace Transport.API.Services
 
                 if (!_routeService.HasNextPoint())
                 {
+                    _dataService.IsActive = true;
                     _routeService.GenerateRoute();
                     _logger.LogInformation("New route generated. Next route time: {NextRouteTime}", _nextRouteTime);
                 }
@@ -74,7 +79,7 @@ namespace Transport.API.Services
 
                 if (_currentTargetPoint != null)
                 {
-                    _logger.LogInformation("Moving to new target point: {PointId}", _currentTargetPoint.Id);
+                    //_logger.LogInformation("Moving to new target point: {PointId}", _currentTargetPoint.Id);
                 }
             }
 
@@ -84,6 +89,7 @@ namespace Transport.API.Services
             }
             else if (!_routeService.HasNextPoint() && _currentTargetPoint == null)
             {
+                _dataService.IsActive = false;
                 _logger.LogDebug("No active route. Transport is stationary.");
             }
         }

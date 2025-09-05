@@ -4,7 +4,7 @@
         Guid Id,
         Guid UserId,
         Guid PointId,
+        string Url,
         PointResponse Point,
-        double X,
-        double Y);
+        bool IsActive);
 }

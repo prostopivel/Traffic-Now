@@ -6,7 +6,7 @@ namespace Transport.API.Hubs
     {
         public async Task SendDataToAll(string jsonData)
         {
-            await Clients.All.SendAsync("ReceiveData", jsonData);
+            await Clients.All.SendAsync("TransportData", jsonData);
         }
     }
 }

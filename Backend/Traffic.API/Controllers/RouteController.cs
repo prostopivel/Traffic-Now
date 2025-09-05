@@ -44,12 +44,12 @@ namespace Traffic.API.Controllers
 
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
             {
-                return Unauthorized("Id not found in token");
+                return Unauthorized(new { message = "Идентификатор не найден в токене" });
             }
 
             if (route?.Transport.UserId != id)
             {
-                return Unauthorized($"You haven`t access to route with id '{routeId}'");
+                return Unauthorized(new { message = $"У вас нет доступа к маршруту с идентификатором '{routeId}'" });
             }
 
             var routeResponse = ContractsFactory.CreateRouteResponse(route);
@@ -65,12 +65,12 @@ namespace Traffic.API.Controllers
 
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
             {
-                return Unauthorized("Id not found in token");
+                return Unauthorized(new { message = "Идентификатор не найден в токене" });
             }
 
             var routes = await _routeService.GetUserRoutesAsync(id);
 
-            var routesResponse = new List<RouteResponse>(routes?.Count ?? 0);
+            var routesResponse = new List<Contracts.RouteResponse>(routes?.Count ?? 0);
             foreach (var route in routes ?? [])
             {
                 routesResponse.Add(ContractsFactory.CreateRouteResponse(route));

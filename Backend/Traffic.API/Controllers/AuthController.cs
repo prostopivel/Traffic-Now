@@ -15,11 +15,14 @@ namespace Traffic.API.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
+        private readonly IConnectionTransportService _connectionTransportService;
 
-        public AuthController(IConfiguration configuration, IUserService userService)
+        public AuthController(IConfiguration configuration, IUserService userService,
+            IConnectionTransportService connectionTransportService)
         {
             _configuration = configuration;
             _userService = userService;
+            _connectionTransportService = connectionTransportService;
         }
 
         [HttpPost("login")]
@@ -89,7 +92,7 @@ namespace Traffic.API.Controllers
             return tokenString;
         }
 
-        private string HashPassword(string password, string salt)
+        private static string HashPassword(string password, string salt)
         {
             var saltedPassword = salt + password;
             var bytes = Encoding.UTF8.GetBytes(saltedPassword);

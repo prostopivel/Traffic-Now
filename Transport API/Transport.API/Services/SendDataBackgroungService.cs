@@ -28,7 +28,7 @@ namespace Transport.API.Services
             {
                 try
                 {
-                    if (_dataService.Transport == null)
+                    if (_dataService.Transport == null || !_dataService.IsActive)
                     {
                         await Task.Delay(1000, stoppingToken);
                         continue;
@@ -41,9 +41,9 @@ namespace Transport.API.Services
 
                     string jsonData = JsonSerializer.Serialize(data);
 
-                    await _hubContext.Clients.All.SendAsync("ReceiveData", jsonData, stoppingToken);
+                    await _hubContext.Clients.All.SendAsync("TransportData", jsonData, stoppingToken);
 
-                    _logger.LogInformation("Data sent: {JsonData}", jsonData);
+                    //_logger.LogInformation("Data sent: {JsonData}", jsonData);
                 }
                 catch (Exception ex)
                 {

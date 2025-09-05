@@ -1,6 +1,4 @@
-﻿using Traffic.Core.Entities;
-
-namespace Traffic.Core.Abstractions.Services
+﻿namespace Traffic.Core.Abstractions.Services
 {
     public interface IMapSerializeService
     {

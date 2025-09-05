@@ -1,0 +1,375 @@
+/* Основной контейнер с меню и контентом */
+.menu-container {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 100%;
+    max-width: 1050px;
+}
+
+/* Основное содержимое */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 785px;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.content-header h1 {
+    color: #667eea;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.logout-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(238, 90, 82, 0.4);
+}
+
+/* Стили для сетки транспорта */
+.transport-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    max-width: 100%;
+}
+
+/* Ограничиваем максимум 2 колонки */
+@media (min-width: 1024px) {
+    .transport-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.transport-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+    position: relative;
+}
+
+.transport-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+}
+
+.transport-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #667eea;
+}
+
+.transport-header i {
+    font-size: 1.5em;
+    margin-right: 10px;
+}
+
+.transport-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transport-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.transport-details {
+    margin-bottom: 15px;
+}
+
+.transport-detail {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.transport-detail i {
+    margin-right: 10px;
+    color: #667eea;
+    width: 20px;
+}
+
+.transport-status {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    width: fit-content;
+    margin-top: 10px;
+}
+
+.status-online {
+    background-color: #e6f7ee;
+    color: #28a745;
+}
+
+.status-offline {
+    background-color: #fef3e8;
+    color: #ff9800;
+}
+
+.status-error {
+    background-color: #ffe9e9;
+    color: #dc3545;
+}
+
+.transport-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.delete-transport-btn {
+    padding: 8px 15px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.delete-transport-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(238, 90, 82, 0.3);
+}
+
+/* Стили для добавления транспорта */
+.add-transport-container {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.add-transport-header {
+    color: #667eea;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.url-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.url-input-container i {
+    position: absolute;
+    left: 20px;
+    color: #667eea;
+    z-index: 2;
+    font-size: 1.1em;
+}
+
+.url-input {
+    width: 100%;
+    padding: 16px 20px 16px 50px;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    outline: none;
+    background: #f8f9fa;
+    font-family: inherit;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.url-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15),
+        inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    background: white;
+}
+
+.add-transport-btn {
+    margin-left: 15px;
+    padding: 16px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.add-transport-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.add-transport-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Стили для состояния загрузки */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #667eea;
+    font-size: 1.2em;
+    grid-column: 1 / -1;
+}
+
+.loading i {
+    margin-right: 10px;
+    animation: spin 1s linear infinite;
+}
+
+/* Сообщения об ошибках/успехе */
+.message {
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+}
+
+.message-success {
+    background-color: #e6f7ee;
+    color: #28a745;
+    border: 1px solid #b7ebc9;
+}
+
+.message-error {
+    background-color: #ffe9e9;
+    color: #dc3545;
+    border: 1px solid #ffc9c9;
+}
+
+.message i {
+    margin-right: 10px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .menu-container {
+        flex-direction: column;
+    }
+
+    .transport-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .transport-card {
+        height: auto;
+    }
+
+    .content-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .url-input-container {
+        flex-direction: column;
+    }
+
+    .add-transport-btn {
+        margin-left: 0;
+        margin-top: 15px;
+        width: 100%;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Улучшенная прокрутка для основного контента */
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Координаты транспорта */
+.coordinates {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.coordinate {
+    background: #f0f4ff;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    color: #667eea;
+}

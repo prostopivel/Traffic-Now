@@ -77,7 +77,7 @@ function createSidebar() {
                 <a href="userMaps.html" id="nav-maps" class="nav-item">
                     <i class="fas fa-map"></i> Мои карты
                 </a>
-                <a href="#" id="nav-transport" class="nav-item">
+                <a href="transport.html" id="nav-transport" class="nav-item">
                     <i class="fas fa-bus"></i> Просмотр транспорта
                 </a>
                 <a href="#" id="nav-profile" class="nav-item">
@@ -114,7 +114,7 @@ function setActiveNavItem() {
         activeNavId = 'nav-menu';
     } else if (currentPage === 'userMaps.html' || currentPage === 'map.html' || pageTitle.includes('карт') || pageTitle.includes('map')) {
         activeNavId = 'nav-maps';
-    } else if (pageTitle.includes('транспорт') || pageTitle.includes('transport') || pageTitle.includes('bus')) {
+    } else if (currentPage === 'transport.html' || pageTitle.includes('транспорт') || pageTitle.includes('transport') || pageTitle.includes('bus')) {
         activeNavId = 'nav-transport';
     } else if (pageTitle.includes('профиль') || pageTitle.includes('profile') || pageTitle.includes('информация')) {
         activeNavId = 'nav-profile';

@@ -27,7 +27,7 @@ namespace Transport.Application.Services
             _routeRepository.GenerateRoute(map, garageId);
 
             var random = new Random();
-            Speed = random.Next(40, 60);
+            Speed = random.Next(70, 90);
         }
 
         public List<Point> GetCurrentRoute()

@@ -84,7 +84,6 @@ function displaySearchResults(maps) {
     let html = '';
     
     maps.forEach(map => {
-        // Проверяем, есть ли карта уже у пользователя
         const isAlreadyAdded = allMaps.some(userMap => userMap.id === map.id);
         const pointsCount = map.points ? map.points.length : 0;
         const connectionsCount = countConnections(map.points || []);
@@ -133,7 +132,6 @@ async function addMapToUser(mapId) {
                 addButton.disabled = true;
             }
             
-            // Скрываем результаты поиска через короткое время
             setTimeout(() => {
                 const searchResults = document.getElementById('searchResults');
                 searchResults.classList.remove('visible');

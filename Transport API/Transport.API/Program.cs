@@ -1,3 +1,4 @@
+using System.Net;
 using Transport.API.Hubs;
 using Transport.API.Services;
 using Transport.Application.Services;
@@ -11,6 +12,12 @@ namespace Transport.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+            {
+                var kestrelSection = context.Configuration.GetSection("Kestrel");
+                serverOptions.Configure(kestrelSection);
+            });
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -28,6 +35,7 @@ namespace Transport.API
             builder.Services.AddHostedService<TransportHostService>();
 
             var app = builder.Build();
+            PrintLocalIpAddresses();
 
             app.UseHttpsRedirection();
             app.MapControllers();
@@ -48,6 +56,36 @@ namespace Transport.API
         {
             builder.Services.AddSingleton<IDataService, DataService>();
             builder.Services.AddSingleton<IRouteService, RouteService>();
+        }
+
+        private static void PrintLocalIpAddresses()
+        {
+            try
+            {
+                var hostName = Dns.GetHostName();
+                Console.WriteLine($"Host Name: {hostName}");
+
+                var ipAddresses = Dns.GetHostAddresses(hostName)
+                    .Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    .ToList();
+
+                if (ipAddresses.Count != 0)
+                {
+                    Console.WriteLine("Local IP Addresses:");
+                    foreach (var ip in ipAddresses)
+                    {
+                        Console.WriteLine($"- {ip}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No IPv4 addresses found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving IP addresses: {ex.Message}");
+            }
         }
     }
 }

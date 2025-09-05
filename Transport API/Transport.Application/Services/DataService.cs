@@ -10,6 +10,7 @@ namespace Transport.Application.Services
         public DataService(IDataRepository dataRepository)
         {
             _dataRepository = dataRepository;
+            IsActive = false;
         }
 
         public Map Map
@@ -23,5 +24,7 @@ namespace Transport.Application.Services
             get => _dataRepository.Transport;
             set => _dataRepository.Transport = value;
         }
+
+        public bool IsActive { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 using System.Net;
-using Transport.API.Hubs;
 using Transport.API.Services;
 using Transport.Application.Services;
 using Transport.Core.Abstractions;
@@ -22,7 +21,6 @@ namespace Transport.API
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddControllers();
-            builder.Services.AddSignalR();
 
             ConfigureRepositories(builder);
             ConfigureRepositoryServices(builder);
@@ -31,15 +29,16 @@ namespace Transport.API
 
             builder.Services.AddHostedService<MapService>();
             builder.Services.AddHostedService<TransportService>();
-            builder.Services.AddHostedService<SendDataBackgroungService>();
+            builder.Services.AddHostedService<TransportHubClientService>();
             builder.Services.AddHostedService<TransportHostService>();
 
             var app = builder.Build();
             PrintLocalIpAddresses();
 
+            app.UseCors("AllowAll");
+            app.UseRouting();
             app.UseHttpsRedirection();
             app.MapControllers();
-            app.MapHub<TransportHub>("/transportHub");
 
             app.Run();
         }

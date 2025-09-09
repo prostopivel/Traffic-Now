@@ -25,13 +25,15 @@ namespace Traffic.Data.Repositories
 
             var result = new Transport(transportResult.FirstOrDefault());
             var pointResult = await _pointRepository.GetAsync(result?.PointId ?? Guid.Empty);
+            var users = await GetTransportUsersAsync(transportId);
 
-            if (result == null || pointResult == null)
+            if (result == null || pointResult == null || users == null)
             {
                 return null;
             }
 
             result.Point = pointResult;
+            result.UsersId = users;
 
             return result;
         }
@@ -41,16 +43,17 @@ namespace Traffic.Data.Repositories
             var newTransport = await GetAsync(transport.Id);
             if (newTransport != null && newTransport.Id != Guid.Empty)
             {
-                return newTransport.Id;
+                var id = await AddTransportUserAsync(transport.Id, transport.UsersId.Last());
+                return id;
             }
 
-            const string sql = "SELECT create_transport(@Id, @UserId, @PointId, @Url)";
+            const string sql = "SELECT create_transport(@Id, @PointId, @Url, @UserId)";
             return await _connection.ExecuteScalarAsync<Guid>(sql, new
             {
                 transport.Id,
-                transport.UserId,
                 transport.PointId,
-                transport.Url
+                transport.Url,
+                UserId = transport.UsersId.Last()
             });
         }
 
@@ -60,9 +63,9 @@ namespace Traffic.Data.Repositories
             return await _connection.ExecuteScalarAsync<Guid>(sql, new
             {
                 transport.Id,
-                transport.UserId,
                 transport.PointId,
-                 transport.Url
+                transport.Url,
+                UserId = transport.UsersId.Last()
             });
         }
 
@@ -73,6 +76,22 @@ namespace Traffic.Data.Repositories
             return await _connection.ExecuteScalarAsync<Guid>(sql, new
             {
                 TransportId = transportId
+            });
+        }
+
+        public async Task<List<(Guid, string)>?> GetUrlsAsync()
+        {
+            const string sql = "SELECT * FROM select_transport_url()";
+            return [.. await _connection.QueryAsync<(Guid, string)>(sql)];
+        }
+
+        public async Task<Guid?> DeleteTransportUserAsync(Guid transportId, Guid userId)
+        {
+            const string sql = "SELECT delete_transport_user(@TransportId, @UserId)";
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                transportId,
+                userId
             });
         }
 
@@ -89,13 +108,15 @@ namespace Traffic.Data.Repositories
             {
                 result.Add(new Transport(item));
                 var pointResult = await _pointRepository.GetAsync(item?.PointId ?? Guid.Empty);
+                var users = await GetTransportUsersAsync(item?.Id ?? Guid.Empty);
 
-                if (pointResult == null)
+                if (pointResult == null || users == null)
                 {
                     return null;
                 }
 
                 result.Last().Point = pointResult;
+                result.Last().UsersId = users;
             }
 
             return result;
@@ -115,14 +136,39 @@ namespace Traffic.Data.Repositories
             {
                 result.Add(new Transport(item));
                 var pointResult = await _pointRepository.GetAsync(item?.PointId ?? Guid.Empty);
+                var users = await GetTransportUsersAsync(item?.Id ?? Guid.Empty);
 
-                if (pointResult == null)
+                if (pointResult == null || users == null)
                 {
                     return null;
                 }
 
                 result.Last().Point = pointResult;
+                result.Last().UsersId = users;
             }
+
+            return result;
+        }
+
+        public async Task<List<Guid>> GetTransportUsersAsync(Guid transportId)
+        {
+            const string sql = "SELECT * FROM select_transport_users(@TransportId)";
+            var transportGuids = await _connection.QueryAsync<Guid>(sql, new
+            {
+                TransportId = transportId
+            });
+
+            return [.. transportGuids];
+        }
+
+        private async Task<Guid> AddTransportUserAsync(Guid transportId, Guid userId)
+        {
+            const string sql = "SELECT add_transport_user(@TransportId, @UserId)";
+            var result = await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                TransportId = transportId,
+                UserId = userId
+            });
 
             return result;
         }

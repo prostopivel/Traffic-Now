@@ -2,6 +2,7 @@
 {
     public record PointResponse(
         Guid TransportId,
+        Guid MapId,
         double X,
         double Y);
 }

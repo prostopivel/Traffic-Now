@@ -9,23 +9,19 @@
     <link rel="stylesheet" href="css/map.css">
     <!-- Иконочный шрифт для иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 </head>
 <body>
     <div class="menu-container">
         <!-- Боковое меню -->
-        <div id="sidebar-container"></div>
+        <div class="sidebar-container" id="sidebar-container"></div>
         
         <!-- Основной контент -->
         <div class="main-content">
             <div class="content-header">
                 <h1 class="title-map"><i class="fas fa-map-marked-alt"></i> Просмотр карты</h1>
                 <div class="header-actions">
-                    <button class="action-btn" onclick="refreshMap()">
-                        <i class="fas fa-sync-alt"></i> Обновить
-                    </button>
-                    <button class="action-btn" onclick="downloadMap()">
-                        <i class="fas fa-download"></i> Экспорт
-                    </button>
                     <button class="logout-btn" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i> Выйти
                     </button>
@@ -36,6 +32,15 @@
             <div class="map-controls">
                 <button class="control-btn" onclick="toggleConnections()">
                     <i class="fas fa-link"></i> Показать связи
+                </button>
+                <button class="control-btn" onclick="toggleTransportVisibility()">
+                    <i class="fas fa-bus" id="transportToggleIcon"></i> <span id="transportToggleText">Скрыть транспорт</span>
+                </button>
+                <button class="control-btn" onclick="refreshMap()">
+                    <i class="fas fa-sync-alt"></i> Обновить
+                </button>
+                <button class="control-btn" onclick="downloadMap()">
+                    <i class="fas fa-download"></i> Экспорт
                 </button>
                 <button class="control-btn" onclick="zoomIn()">
                     <i class="fas fa-search-plus"></i> Увеличить
@@ -68,6 +73,10 @@
                         <p id="connectionsCount">0</p>
                     </div>
                     <div class="info-item">
+                        <h4>Активный транспорт</h4>
+                        <p id="activeTransportCount">0</p>
+                    </div>
+                    <div class="info-item">
                         <h4>Статус</h4>
                         <p id="mapStatus">Активна</p>
                     </div>
@@ -80,7 +89,6 @@
         </div>
     </div>
 
-    <!-- Подключение скрипта авторизации -->
     <script src="js/utils.js"></script>
     <script src="js/map.js"></script>
 </body>

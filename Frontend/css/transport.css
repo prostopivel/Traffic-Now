@@ -2,7 +2,6 @@
 .menu-container {
     display: flex;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     width: 100%;
     max-width: 1050px;
 }
@@ -61,11 +60,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     max-width: 100%;
 }
 
-/* Ограничиваем максимум 2 колонки */
 @media (min-width: 1024px) {
     .transport-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -81,7 +79,6 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    height: 280px;
     position: relative;
 }
 
@@ -301,8 +298,8 @@
 
 /* Адаптивность */
 @media (max-width: 768px) {
-    .menu-container {
-        flex-direction: column;
+    .main-content {
+        padding: 15px;
     }
 
     .transport-grid {

@@ -1,4 +1,5 @@
-﻿using Transport.Application.Services;
+﻿using System.Text;
+using Transport.Application.Services;
 using Transport.Core.Abstractions;
 using Transport.Core.Models;
 
@@ -7,17 +8,19 @@ namespace Transport.API.Services
     public class TransportHostService : BackgroundService
     {
         private const int MIN_WAIT_MINUTES = 2, MAX_WAIT_MINUTES = 3;
-        private const double COORDINATE_SCALE = 100.0;
+        private const double COORDINATE_SCALE = 50.0; //1 единица = 50 метров
         private readonly IRouteService _routeService;
         private readonly IDataService _dataService;
         private readonly ILogger<TransportHostService> _logger;
 
+        private readonly string _serverUrl;
         private DateTime _nextRouteTime;
         private Point? _currentTargetPoint = null;
         private Point? _previousPoint = null;
         private double _progressToTarget = 0;
 
-        public TransportHostService(IRouteService routeService, IDataService dataService, ILogger<TransportHostService> logger)
+        public TransportHostService(IConfiguration configuration, IRouteService routeService,
+            IDataService dataService, ILogger<TransportHostService> logger)
         {
             _routeService = routeService;
             _dataService = dataService;
@@ -25,7 +28,16 @@ namespace Transport.API.Services
 
             var random = new Random();
             _nextRouteTime = DateTime.Now.AddSeconds(
-                random.Next(0, 120));
+                random.Next(0, 20));
+
+            var hubUrl = configuration["CentralHubUrl"] ?? "https://localhost:7003/transportAPIHub";
+            _serverUrl = hubUrl.Replace("/transportAPIHub", "/api/transport/setGarage");
+            _routeService.LastPointEvent += UpdateGarage;
+        }
+
+        private void _routeService_LastPointEvent(Guid pointId)
+        {
+            throw new NotImplementedException();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -53,6 +65,27 @@ namespace Transport.API.Services
             _logger.LogInformation("Transport Host Service stopped");
         }
 
+        private async void UpdateGarage(Guid pointId)
+        {
+            var transportId = _dataService.Transport.Id.ToString();
+
+            using var httpClient = new HttpClient();
+            HttpResponseMessage? response = null;
+            try
+            {
+                var url = $"{_serverUrl}?transportId={transportId}&pointId={pointId}";
+
+                response = await httpClient.PutAsync(url, null);
+
+                _logger.LogInformation("Sent data to central hub: TransportId: {TransportId}, PointId: {PointId}",
+                                      transportId, pointId.ToString());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Can not connect to {url}! Error message: {message}", _serverUrl, ex.Message);
+            }
+        }
+
         private void ProcessMovement(CancellationToken stoppingToken)
         {
             if (_nextRouteTime < DateTime.Now)
@@ -72,9 +105,15 @@ namespace Transport.API.Services
             if (_currentTargetPoint == null && _routeService.HasNextPoint())
             {
                 _currentTargetPoint = _routeService.GetPoint();
-                _previousPoint = _dataService.Transport.PointId != Guid.Empty
-                    ? _dataService.Map.Points.FirstOrDefault(p => p.Id == _dataService.Transport.PointId)
-                    : null;
+
+                _previousPoint = new Point
+                {
+                    Id = _dataService.Transport.PointId,
+                    X = _dataService.Transport.X,
+                    Y = _dataService.Transport.Y,
+                    ConnectedPointsIds = []
+                };
+
                 _progressToTarget = 0;
 
                 if (_currentTargetPoint != null)
@@ -109,14 +148,18 @@ namespace Transport.API.Services
 
             if (totalDistanceMeters <= 10)
             {
+                _dataService.Transport.X = _currentTargetPoint.X;
+                _dataService.Transport.Y = _currentTargetPoint.Y;
+                _dataService.Transport.PointId = _currentTargetPoint.Id;
+
+                _logger.LogDebug("Reached target point: {PointId}", _currentTargetPoint.Id);
                 _currentTargetPoint = null;
+                _progressToTarget = 0;
                 return;
             }
 
             double speedMetersPerSecond = _routeService.Speed * 1000 / 3600;
-
             double distancePerSecond = speedMetersPerSecond;
-
             double progressIncrement = distancePerSecond / totalDistanceMeters;
 
             _progressToTarget += progressIncrement;
@@ -125,6 +168,7 @@ namespace Transport.API.Services
             {
                 _dataService.Transport.X = _currentTargetPoint.X;
                 _dataService.Transport.Y = _currentTargetPoint.Y;
+                _dataService.Transport.PointId = _currentTargetPoint.Id;
 
                 _logger.LogDebug("Reached target point: {PointId}", _currentTargetPoint.Id);
                 _currentTargetPoint = null;

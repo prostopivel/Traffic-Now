@@ -2,7 +2,6 @@
 .menu-container {
     display: flex;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     width: 100%;
     max-width: 1050px;
 }
@@ -128,35 +127,11 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
-    .menu-container {
-        flex-direction: column;
+    .main-content {
+        padding: 15px;
     }
-
-    .sidebar {
-        width: 100%;
-        padding: 10px 0;
-    }
-
-    .nav-items {
-        display: flex;
-        overflow-x: auto;
-    }
-
-    .nav-item {
-        border-left: none;
-        border-bottom: 4px solid transparent;
-        white-space: nowrap;
-    }
-
-    .nav-item:hover,
-    .nav-item.active {
-        border-left-color: transparent;
-        border-bottom-color: #667eea;
-    }
-
-    /* На мобильных - 1 колонка */
+    
     .dashboard-cards,
     .action-buttons {
         grid-template-columns: 1fr;

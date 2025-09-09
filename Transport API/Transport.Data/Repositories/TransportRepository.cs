@@ -9,6 +9,13 @@ namespace Transport.Data.Repositories
     {
         private readonly string _path = string.Empty;
 
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+        {
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
         public TransportRepository(IConfiguration configuration)
         {
             _path = string.IsNullOrEmpty(configuration["MapPath"])
@@ -24,13 +31,6 @@ namespace Transport.Data.Repositories
             {
                 var random = new Random();
 
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                };
-
                 var point = _dataService.Map.Points[random.Next(0, _dataService.Map.Points.Count)];
 
                 var transport = new Core.Models.Transport(
@@ -39,7 +39,7 @@ namespace Transport.Data.Repositories
                     point.X,
                     point.Y);
 
-                var json = JsonSerializer.Serialize(transport, options);
+                var json = JsonSerializer.Serialize(transport, _jsonSerializerOptions);
                 File.WriteAllText(_path, json);
             }
         }
@@ -48,15 +48,8 @@ namespace Transport.Data.Repositories
         {
             if (File.Exists(_path))
             {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                };
-
                 var jsonText = File.ReadAllText(_path);
-                return JsonSerializer.Deserialize<Core.Models.Transport>(jsonText, options)
+                return JsonSerializer.Deserialize<Core.Models.Transport>(jsonText, _jsonSerializerOptions)
                     ?? throw new JsonException($"Can not convert json text to {typeof(Core.Models.Transport)}");
             }
             else

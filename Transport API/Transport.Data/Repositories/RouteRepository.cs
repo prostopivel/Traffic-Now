@@ -1,12 +1,15 @@
 ﻿using Transport.Core.Abstractions;
 using Transport.Core.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Transport.Data.Repositories
 {
     public class RouteRepository : IRouteRepository
     {
-        private readonly Queue<Point> _points = new Queue<Point>();
-        private readonly Random _random = new Random();
+        private readonly Queue<Point> _points = new();
+        private readonly Random _random = new();
+        private Point? _garagePoint;
 
         public int Speed { get; set; }
 
@@ -14,8 +17,9 @@ namespace Transport.Data.Repositories
         {
             _points.Clear();
             Speed = _random.Next(60, 80);
+            _garagePoint = map.Points.FirstOrDefault(p => p.Id == garageId);
 
-            GenerateNewRoute(map, garageId);
+            GenerateNewRoute(map);
         }
 
         public Point? GetPoint()
@@ -30,7 +34,7 @@ namespace Transport.Data.Repositories
 
         public List<Point> GetCurrentRoute()
         {
-            return _points.ToList();
+            return [.. _points];
         }
 
         public bool HasNextPoint()
@@ -41,34 +45,21 @@ namespace Transport.Data.Repositories
         public void ClearRoute()
         {
             _points.Clear();
+            _garagePoint = null;
         }
 
-        private void GenerateNewRoute(Map map, Guid garageId)
+        private void GenerateNewRoute(Map map)
         {
-            var garagePoint = map.Points.FirstOrDefault(p => p.Id == garageId);
-            if (garagePoint == null)
+            if (_garagePoint == null)
             {
-                garagePoint = GetRandomPoint(map);
-                if (garagePoint == null) return;
+                _garagePoint = GetRandomPoint(map);
+                if (_garagePoint == null) return;
             }
 
-            var route = GenerateDepthFirstRoute(map, garagePoint);
+            var route = GenerateDepthFirstRoute(map, _garagePoint);
 
             int maxRouteLength = _random.Next(5, Math.Min(16, map.Points.Count + 1));
             var limitedRoute = route.Take(maxRouteLength).ToList();
-
-            if (limitedRoute.Count > 0 && limitedRoute.Last().Id != garageId)
-            {
-                var returnPath = FindPathToGarage(map, limitedRoute.Last(), garagePoint);
-                if (returnPath != null && returnPath.Count > 1)
-                {
-                    limitedRoute.AddRange(returnPath.Skip(1));
-                }
-                else
-                {
-                    limitedRoute.Add(garagePoint);
-                }
-            }
 
             foreach (var point in limitedRoute)
             {
@@ -78,70 +69,41 @@ namespace Transport.Data.Repositories
 
         private List<Point> GenerateDepthFirstRoute(Map map, Point startPoint)
         {
-            var visited = new HashSet<Guid>();
             var route = new List<Point>();
+            var visited = new HashSet<Guid>();
             var stack = new Stack<Point>();
 
             stack.Push(startPoint);
             visited.Add(startPoint.Id);
 
-            while (stack.Count > 0)
+            while (stack.Count > 0 && route.Count < map.Points.Count * 2)
             {
                 var current = stack.Pop();
                 route.Add(current);
 
-                var connectedPoints = GetConnectedPoints(map, current)
-                    .Where(p => !visited.Contains(p.Id))
-                    .ToList();
+                var connectedPoints = GetConnectedPoints(map, current).ToList();
 
                 if (connectedPoints.Count > 0)
                 {
-                    var shuffledPoints = connectedPoints.OrderBy(_ => _random.Next()).ToList();
+                    var unvisitedPoints = connectedPoints.Where(p => !visited.Contains(p.Id)).ToList();
+                    var visitedPoints = connectedPoints.Where(p => visited.Contains(p.Id)).ToList();
 
-                    foreach (var point in shuffledPoints)
+                    var shuffledUnvisited = unvisitedPoints.OrderBy(_ => _random.Next()).ToList();
+                    foreach (var point in shuffledUnvisited)
                     {
-                        if (!visited.Contains(point.Id))
-                        {
-                            stack.Push(point);
-                            visited.Add(point.Id);
-                        }
+                        visited.Add(point.Id);
+                        stack.Push(point);
+                    }
+
+                    if (visitedPoints.Count > 0 && _random.NextDouble() < 0.3)
+                    {
+                        var randomVisitedPoint = visitedPoints[_random.Next(visitedPoints.Count)];
+                        stack.Push(randomVisitedPoint);
                     }
                 }
             }
 
             return route;
-        }
-
-        private List<Point>? FindPathToGarage(Map map, Point startPoint, Point garagePoint)
-        {
-            var queue = new Queue<List<Point>>();
-            var visited = new HashSet<Guid>();
-
-            queue.Enqueue(new List<Point> { startPoint });
-            visited.Add(startPoint.Id);
-
-            while (queue.Count > 0)
-            {
-                var path = queue.Dequeue();
-                var current = path.Last();
-
-                if (current.Id == garagePoint.Id)
-                {
-                    return path;
-                }
-
-                foreach (var connectedPoint in GetConnectedPoints(map, current))
-                {
-                    if (!visited.Contains(connectedPoint.Id))
-                    {
-                        visited.Add(connectedPoint.Id);
-                        var newPath = new List<Point>(path) { connectedPoint };
-                        queue.Enqueue(newPath);
-                    }
-                }
-            }
-
-            return null;
         }
 
         private Point? GetRandomPoint(Map map)
@@ -150,7 +112,7 @@ namespace Transport.Data.Repositories
             return map.Points[_random.Next(map.Points.Count)];
         }
 
-        private IEnumerable<Point> GetConnectedPoints(Map map, Point point)
+        private static IEnumerable<Point> GetConnectedPoints(Map map, Point point)
         {
             foreach (var connectedPointId in point.ConnectedPointsIds)
             {

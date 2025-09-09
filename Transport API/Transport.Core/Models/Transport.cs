@@ -4,7 +4,7 @@
     {
         public Guid Id { get; }
 
-        public Guid PointId { get; }
+        public Guid PointId { get; set; }
 
         public double X { get; set; }
 

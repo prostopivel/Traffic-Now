@@ -46,7 +46,7 @@ namespace Traffic.API.Contracts
         {
             (var transport, var Error) = Transport.Create(
                 transportResponse.Id,
-                userId,
+                [userId],
                 transportResponse.PointId,
                 url,
                 transportResponse.X,
@@ -61,7 +61,6 @@ namespace Traffic.API.Contracts
 
             var transportResponse = new TransportResponse(
                 transport.Id,
-                transport.UserId,
                 transport.PointId,
                 transport.Url,
                 pointResponse,

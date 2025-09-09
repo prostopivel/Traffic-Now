@@ -33,6 +33,16 @@ namespace Traffic.Application.Services
             return await _transportRepository.DeleteAsync(transportId);
         }
 
+        public async Task<List<(Guid, string)>?> GetUrlsAsync()
+        {
+            return await _transportRepository.GetUrlsAsync();
+        }
+
+        public async Task<Guid?> DeleteTransportUserAsync(Guid transportId, Guid userId)
+        {
+            return await _transportRepository.DeleteTransportUserAsync(transportId, userId);
+        }
+
         public async Task<List<Transport>?> GetUserTransportAsync(Guid userId)
         {
             return await _transportRepository.GetUserTransportAsync(userId);
@@ -41,6 +51,11 @@ namespace Traffic.Application.Services
         public async Task<List<Transport>?> GetUserTransportAsync(Guid mapId, Guid userId)
         {
             return await _transportRepository.GetUserTransportAsync(mapId, userId);
+        }
+
+        public async Task<List<Guid>> GetTransportUsersAsync(Guid transportId)
+        {
+            return await _transportRepository.GetTransportUsersAsync(transportId);
         }
     }
 }

@@ -53,6 +53,11 @@ namespace Traffic.Application.Services
             return await _mapRepository.AddUserMap(userId, mapId);
         }
 
+        public async Task<Guid?> DeleteUserMap(Guid userId, Guid mapId)
+        {
+            return await _mapRepository.DeleteUserMap(userId, mapId);
+        }
+
         public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)
         {
             return await _mapRepository.CreateMapPointsAsync(points);

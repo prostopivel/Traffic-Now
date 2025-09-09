@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Traffic.API.APIServices;
+using Traffic.API.Hubs;
 using Traffic.API.Services;
 using Traffic.Application.Services;
 using Traffic.Core.Abstractions.Repositories;
@@ -25,8 +27,18 @@ namespace Traffic.API
             builder.Services.AddControllers();
             builder.Services.AddSwaggerGen();
 
+            ConfigureCors(builder);
+
+            builder.Services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+            })
+                .AddJsonProtocol();
+
             builder.Services.AddSingleton(connectionString);
-            builder.Services.AddSingleton<ITransportAPIConnection, TransportAPIConnection>();
+            builder.Services.AddSingleton<ITransportDataService, TransportDataService>();
+            builder.Services.AddSingleton<TransportClientHub>();
+            builder.Services.AddSingleton<TransportAPIHub>();
 
             builder.Services.AddPostgresDatabase(options =>
             {
@@ -35,12 +47,13 @@ namespace Traffic.API
             });
 
             ConfigureAuthorization(builder);
-            ConfigureCors(builder);
             ConfigureRepositories(builder);
             ConfigureRepositoryServices(builder);
             builder.Services.AddScoped<IMapSerializeService, MapSerializeService>();
             builder.Services.AddScoped<ITransportHttpConnection, TransportHttpConnection>();
-            builder.Services.AddScoped<IConnectionTransportService, ConnectionTransportService>();
+
+            builder.Services.AddHostedService<TransportCoordinatorService>();
+            builder.Services.AddHostedService<TransportResponseService>();
 
             builder.Services.AddAuthorization();
 
@@ -53,24 +66,57 @@ namespace Traffic.API
                 app.UseSwaggerUI();
             }
 
-            app.UseCors("AllowAll");
+            app.Use(ConfigureWebSocket);
+
+            app.UseCors("AllowSpecificOrigins");
+
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 
+            app.MapHub<TransportClientHub>("/transportClientHub")
+                .RequireAuthorization();
+            app.MapHub<TransportAPIHub>("/transportAPIHub");
+
             app.Run();
+        }
+
+        private static async Task ConfigureWebSocket(HttpContext context, Func<Task> next)
+        {
+            if (context.Request.Path.StartsWithSegments("/transportClientHub"))
+            {
+                Console.WriteLine($"Hub request: {context.Request.Path}");
+                Console.WriteLine($"Query string: {context.Request.QueryString}");
+
+                var tokenFromQuery = context.Request.Query["access_token"];
+                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+
+                Console.WriteLine($"Token from query: {!string.IsNullOrEmpty(tokenFromQuery)}");
+                Console.WriteLine($"Auth header: {!string.IsNullOrEmpty(authHeader)}");
+            }
+
+            await next();
         }
 
         private static void ConfigureCors(WebApplicationBuilder builder)
         {
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
+                options.AddPolicy("AllowSpecificOrigins", policy =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
+                    policy.WithOrigins(
+                            "https://localhost:7003",
+                            "http://localhost:3000",
+                            "http://127.0.0.1:3000",
+                            "http://localhost:3001",
+                            "http://127.0.0.1:3001",
+                            "null"
+                        )
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowed(_ => true);
                 });
             });
         }
@@ -111,7 +157,42 @@ namespace Traffic.API
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+
+                        if (!string.IsNullOrEmpty(accessToken))
+                        {
+                            context.Token = accessToken;
+                            Console.WriteLine($"Token from query: {accessToken.ToString()[..20]}...");
+                        }
+                        else if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                        {
+                            context.Token = authHeader["Bearer ".Length..];
+                            Console.WriteLine($"Token from header: {context.Token}...");
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        Console.WriteLine($"Token validated for: {context.Principal?.Identity?.Name}");
+                        return Task.CompletedTask;
+                    }
                 };
             });
         }

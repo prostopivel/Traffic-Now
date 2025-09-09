@@ -14,6 +14,8 @@ namespace Transport.Application.Services
             _routeRepository = routeRepository;
         }
 
+        public event GetGuid LastPointEvent;
+
         public int Speed
         {
             get => _routeRepository.Speed;
@@ -37,7 +39,14 @@ namespace Transport.Application.Services
 
         public Point? GetPoint()
         {
-            return _routeRepository.GetPoint();
+            var point = _routeRepository.GetPoint();
+
+            if (point != null && !HasNextPoint())
+            {
+                LastPointEvent?.Invoke(point.Id);
+            }
+
+            return point;
         }
 
         public Point? PeekPoint()

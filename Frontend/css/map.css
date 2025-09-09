@@ -88,7 +88,6 @@
 .menu-container {
     display: flex;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     width: 100%;
     max-width: 1050px;
 }
@@ -194,10 +193,12 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
+    z-index: 5;
 }
 
 .map-point:hover .point-label {
     opacity: 1;
+    z-index: 30;
 }
 
 /* Соединительные линии */
@@ -277,32 +278,73 @@
     font-weight: 600;
 }
 
+.map-transport {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-transport.active {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.map-transport.inactive {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    opacity: 0.6;
+}
+
+.map-transport i {
+    color: white;
+    font-size: 16px;
+}
+
+.map-transport:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.5);
+}
+
+.transport-label {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.map-transport:hover .transport-label {
+    opacity: 1;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
-    .menu-container {
-        flex-direction: column;
+    .main-content {
+        padding: 15px;
     }
 
-    .sidebar {
-        width: 100%;
-        padding: 10px 0;
-    }
-
-    .nav-items {
-        display: flex;
-        overflow-x: auto;
-    }
-
-    .nav-item {
-        border-left: none;
-        border-bottom: 4px solid transparent;
-        white-space: nowrap;
-    }
-
-    .nav-item:hover,
-    .nav-item.active {
-        border-left-color: transparent;
-        border-bottom-color: #667eea;
+    .title-map {
+        white-space: pre-line;
+        min-width: 220px;
+        font-size: 1.5em;
     }
 
     .content-header {
@@ -318,5 +360,19 @@
 
     .map-controls {
         justify-content: center;
+    }
+
+    .map-transport {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .map-transport i {
+        font-size: 14px;
+    }
+    
+    .transport-label {
+        font-size: 10px;
+        top: -35px;
     }
 }

@@ -138,12 +138,27 @@ namespace Traffic.API.Controllers
                 return Unauthorized(new { message = "Идентификатор не найден в токене" });
             }
 
-            var maps = await _mapService.GetUserMaps(id);
-
             var resId = await _mapService.AddUserMap(id, mapId);
 
             return Ok(resId);
         }
+
+        [HttpDelete("deleteMap")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUserMap([FromQuery] Guid mapId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
+            {
+                return Unauthorized(new { message = "Идентификатор не найден в токене" });
+            }
+
+            var resId = await _mapService.DeleteUserMap(id, mapId);
+
+            return Ok(resId);
+        }
+
 
         [HttpPost("saveMap")]
         [Authorize(Roles = "Admin")]
@@ -152,6 +167,15 @@ namespace Traffic.API.Controllers
             var id = await _mapSerializeService.CreateMapJson(path, mapId);
 
             return Ok(id);
+        }
+
+        [HttpGet("exportMap")]
+        [Authorize]
+        public async Task<IActionResult> GetJsonMapAsync([FromQuery] Guid mapId)
+        {
+            var json = await _mapSerializeService.ExportMapJson(mapId);
+
+            return Ok(json);
         }
     }
 }

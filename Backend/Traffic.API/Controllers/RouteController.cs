@@ -47,7 +47,7 @@ namespace Traffic.API.Controllers
                 return Unauthorized(new { message = "Идентификатор не найден в токене" });
             }
 
-            if (route?.Transport.UserId != id)
+            if (route == null || !route.Transport.UsersId.Contains(id))
             {
                 return Unauthorized(new { message = $"У вас нет доступа к маршруту с идентификатором '{routeId}'" });
             }

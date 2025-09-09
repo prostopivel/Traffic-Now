@@ -10,6 +10,12 @@
 
     public record PointTransportResponse(
         Guid TransportId,
+        Guid MapId,
+        double X,
+        double Y);
+
+    public record PositionTransportResponse(
+        Guid TransportId,
         double X,
         double Y);
 }

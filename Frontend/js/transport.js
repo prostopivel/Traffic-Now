@@ -73,7 +73,7 @@ function createTransportCard(transport) {
                     <div class="transport-details">
                         <div class="transport-detail">
                             <i class="fas fa-link"></i>
-                            <span>${getUrl(transport.url) ? shortenUrl(getUrl(transport.url)) : 'URL не указан'}</span>
+                            <span>${transport.url ? shortenUrl(transport.url) : 'URL не указан'}</span>
                         </div>
                         <div class="transport-detail">
                             <i class="fas fa-map-marker-alt"></i>
@@ -160,7 +160,7 @@ async function deleteTransport(transportId, event) {
     }
 
     try {
-        await getProtectedData('transport', 'DELETE', { transportId: transportId });
+        await getProtectedData('transport/deleteUser', 'DELETE', { transportId: transportId });
 
         allTransport = allTransport.filter(t => t.id !== transportId);
         renderTransport(allTransport);
@@ -228,8 +228,4 @@ function isValidUrl(string) {
     } catch (_) {
         return false;
     }
-}
-
-function logout() {
-    console.log('Logout called');
 }

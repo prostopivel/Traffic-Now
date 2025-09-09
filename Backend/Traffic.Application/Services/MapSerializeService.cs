@@ -1,15 +1,20 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Traffic.Core.Abstractions.Repositories;
 using Traffic.Core.Abstractions.Services;
-using Traffic.Core.Entities;
 
 namespace Traffic.Application.Services
 {
     public class MapSerializeService : IMapSerializeService
     {
         private readonly IMapRepository _mapRepository;
+
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+        {
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
 
         public MapSerializeService(IMapRepository mapRepository)
         {
@@ -18,19 +23,19 @@ namespace Traffic.Application.Services
 
         public async Task<Guid> CreateMapJson(string path, Guid mapId)
         {
-            var map = await _mapRepository.GetMapPointsAsync(mapId);
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-
-            string json = JsonSerializer.Serialize(map, options);
+            var json = await ExportMapJson(mapId);
             File.WriteAllText(path, json);
 
             return mapId;
+        }
+
+        public async Task<string> ExportMapJson(Guid mapId)
+        {
+            var map = await _mapRepository.GetMapPointsAsync(mapId);
+
+            string json = JsonSerializer.Serialize(map, _jsonSerializerOptions);
+
+            return json;
         }
     }
 }

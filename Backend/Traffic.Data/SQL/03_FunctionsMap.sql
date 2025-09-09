@@ -81,4 +81,12 @@ begin
 end;
 $$ language plpgsql;
 
-select * from Users_Maps
+create or replace function delete_user_map(CurrentUserId uuid, CurrentMapId uuid)
+returns uuid as $$
+begin
+	delete from Users_Maps um
+	where um.UserId = CurrentUserId and um.MapId = CurrentMapId;
+
+	return CurrentUserId;
+end;
+$$ language plpgsql;

@@ -1,18 +1,22 @@
 let allMaps = [];
 let searchTimeout = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadMaps();
-    
-    document.addEventListener('click', function(e) {
+
+    document.addEventListener('click', function (e) {
         const searchResults = document.getElementById('searchResults');
         const searchBox = document.querySelector('.search-box');
-        
-        if (searchResults && searchBox && 
-            !searchResults.contains(e.target) && 
+
+        if (searchResults && searchBox &&
+            !searchResults.contains(e.target) &&
             !searchBox.contains(e.target)) {
             searchResults.classList.remove('visible');
         }
+    });
+
+    window.addEventListener('resize', function() {
+        renderMaps(allMaps);
     });
 });
 
@@ -30,17 +34,17 @@ async function loadMaps() {
 function searchMaps() {
     const searchTerm = document.getElementById('mapSearch').value.trim();
     const searchResults = document.getElementById('searchResults');
-    
+
     if (searchTimeout) {
         clearTimeout(searchTimeout);
     }
-    
+
     if (!searchTerm) {
         searchResults.classList.remove('visible');
         searchResults.innerHTML = '';
         return;
     }
-    
+
     searchResults.innerHTML = `
         <div class="search-loading">
             <i class="fas fa-spinner"></i>
@@ -48,13 +52,13 @@ function searchMaps() {
         </div>
     `;
     searchResults.classList.add('visible');
-    
+
     searchTimeout = setTimeout(async () => {
         try {
-            const foundMaps = await getProtectedData('map/search', 'GET', { 
-                name: searchTerm 
+            const foundMaps = await getProtectedData('map/search', 'GET', {
+                name: searchTerm
             });
-            
+
             displaySearchResults(foundMaps);
         } catch (error) {
             console.error('Ошибка поиска карт:', error);
@@ -70,7 +74,7 @@ function searchMaps() {
 
 function displaySearchResults(maps) {
     const searchResults = document.getElementById('searchResults');
-    
+
     if (!maps || maps.length === 0) {
         searchResults.innerHTML = `
             <div class="search-no-results">
@@ -80,14 +84,14 @@ function displaySearchResults(maps) {
         `;
         return;
     }
-    
+
     let html = '';
-    
+
     maps.forEach(map => {
         const isAlreadyAdded = allMaps.some(userMap => userMap.id === map.id);
         const pointsCount = map.points ? map.points.length : 0;
         const connectionsCount = countConnections(map.points || []);
-        
+
         html += `
             <div class="search-result-item" data-map-id="${map.id}">
                 <div class="search-result-info">
@@ -111,27 +115,27 @@ function displaySearchResults(maps) {
             </div>
         `;
     });
-    
+
     searchResults.innerHTML = html;
 }
 
 async function addMapToUser(mapId) {
     try {
-        const result = await getProtectedData('map/addUserMap', 'POST', { 
-            mapId: mapId 
+        const result = await getProtectedData('map/addUserMap', 'POST', {
+            mapId: mapId
         });
-        
+
         if (result) {
             showSuccess('Карта успешно добавлена!');
-            
+
             await loadMaps();
-            
+
             const addButton = document.querySelector(`[data-map-id="${mapId}"] .add-map-btn-search`);
             if (addButton) {
                 addButton.textContent = 'Добавлена';
                 addButton.disabled = true;
             }
-            
+
             setTimeout(() => {
                 const searchResults = document.getElementById('searchResults');
                 searchResults.classList.remove('visible');
@@ -153,7 +157,7 @@ function clearSearch() {
 function renderMaps(maps) {
     const container = document.getElementById('mapsContainer');
     const emptyContainer = '';
-    
+
     if (!maps || maps.length === 0) {
         emptyContainer.innerHTML = `
             <div class="no-results">
@@ -169,7 +173,7 @@ function renderMaps(maps) {
     }
 
     container.innerHTML = '';
-    
+
     maps.forEach(map => {
         const mapCard = createMapCard(map);
         container.appendChild(mapCard);
@@ -180,7 +184,7 @@ function createMapCard(map) {
     const card = document.createElement('div');
     card.className = 'map-card';
     card.onclick = () => viewMap(map.id);
-    
+
     card.innerHTML = `
         <div class="map-header">
             <i class="fas fa-map"></i>
@@ -190,7 +194,7 @@ function createMapCard(map) {
             <div class="map-canvas" id="preview-${map.id}">
                 <div class="map-content"></div>
             </div>
-        </div>
+       </div>
         <div class="map-stats">
             <div class="map-stat">
                 <i class="fas fa-dot-circle"></i>
@@ -201,26 +205,31 @@ function createMapCard(map) {
                 <span>${countConnections(map.points)} связей</span>
             </div>
         </div>
+        <div class="map-actions">
+            <button class="delete-map-btn" onclick="deleteMap('${map.id}', event)">
+                <i class="fas fa-trash"></i> Удалить
+            </button>
+        </div>
     `;
-    
+
     setTimeout(() => renderMapPreview(map, card), 100);
-    
+
     return card;
 }
 
 function renderMapPreview(map, card) {
     const previewContainer = card.querySelector(`#preview-${map.id} .map-content`);
     if (!previewContainer) return;
-    
+
     const containerRect = previewContainer.getBoundingClientRect();
     const containerWidth = containerRect.width;
     const containerHeight = containerRect.height;
-    
+
     previewContainer.innerHTML = '';
-    
+
     if (map.points && map.points.length > 0) {
         renderConnectionsPreview(map.points, previewContainer, containerWidth, containerHeight);
-        
+
         map.points.forEach(point => {
             renderPointPreview(point, previewContainer, containerWidth, containerHeight);
         });
@@ -232,7 +241,7 @@ function renderConnectionsPreview(points, container, containerWidth, containerHe
     points.forEach(point => {
         pointsDict[point.id] = point;
     });
-    
+
     points.forEach(point => {
         if (point.connectedPointsIds) {
             point.connectedPointsIds.forEach(connectedPointId => {
@@ -240,17 +249,17 @@ function renderConnectionsPreview(points, container, containerWidth, containerHe
                 if (connectedPoint) {
                     const connection = document.createElement('div');
                     connection.className = 'connection-line';
-                    
+
                     const x1 = (point.x / 100) * containerWidth;
                     const y1 = (point.y / 100) * containerHeight;
                     const x2 = (connectedPoint.x / 100) * containerWidth;
                     const y2 = (connectedPoint.y / 100) * containerHeight;
-                    
+
                     const deltaX = x2 - x1;
                     const deltaY = y2 - y1;
                     const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                     const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
-                    
+
                     connection.style.width = `${length}px`;
                     connection.style.height = '2px';
                     connection.style.left = `${point.x}%`;
@@ -259,7 +268,7 @@ function renderConnectionsPreview(points, container, containerWidth, containerHe
                     connection.style.transformOrigin = '0 0';
                     connection.style.backgroundColor = '#667eea';
                     connection.style.opacity = '0.4';
-                    
+
                     container.appendChild(connection);
                 }
             });
@@ -273,18 +282,18 @@ function renderPointPreview(point, container, containerWidth, containerHeight) {
     pointElement.style.left = `${point.x}%`;
     pointElement.style.top = `${point.y}%`;
     pointElement.title = point.name;
-    
+
     const label = document.createElement('div');
     label.className = 'point-label';
     label.textContent = point.name;
     pointElement.appendChild(label);
-    
+
     container.appendChild(pointElement);
 }
 
 function countConnections(points) {
     if (!points) return 0;
-    
+
     let total = 0;
     points.forEach(point => {
         if (point.connectedPointsIds) {
@@ -311,4 +320,55 @@ function showSuccess(message) {
 
 function showError(message) {
     alert('✗ ' + message);
+}
+
+async function deleteMap(transportId, event) {
+    if (event) {
+        event.stopPropagation();
+    }
+
+    if (!confirm('Вы уверены, что хотите удалить эту карту?')) {
+        return;
+    }
+
+    try {
+        await getProtectedData('map/deleteMap', 'DELETE', { transportId: transportId });
+
+        allTransport = allTransport.filter(t => t.id !== transportId);
+        renderMaps(allMaps);
+
+        showSuccess('Транспорт успешно удален!');
+
+    } catch (error) {
+        console.error('Ошибка удаления транспорта:', error);
+        showError('Не удалось удалить транспорт');
+    }
+}
+
+function showSuccess(message) {
+    const messageContainer = document.getElementById('messageContainer');
+    messageContainer.innerHTML = `
+                <div class="message message-success">
+                    <i class="fas fa-check-circle"></i>
+                    ${message}
+                </div>
+            `;
+
+    setTimeout(() => {
+        messageContainer.innerHTML = '';
+    }, 3000);
+}
+
+function showError(message) {
+    const messageContainer = document.getElementById('messageContainer');
+    messageContainer.innerHTML = `
+                <div class="message message-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    ${message}
+                </div>
+            `;
+
+    setTimeout(() => {
+        messageContainer.innerHTML = '';
+    }, 5000);
 }

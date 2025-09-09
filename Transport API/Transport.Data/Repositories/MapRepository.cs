@@ -10,6 +10,12 @@ namespace Transport.Data.Repositories
     {
         private readonly string _path = string.Empty;
 
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+        {
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
         public MapRepository(IConfiguration configuration)
         {
             _path = string.IsNullOrEmpty(configuration["MapPath"])
@@ -35,16 +41,8 @@ namespace Transport.Data.Repositories
 
         public Map GetMap()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-
-
             var jsonText = File.ReadAllText(_path);
-            var map = JsonSerializer.Deserialize<Map>(jsonText, options)
+            var map = JsonSerializer.Deserialize<Map>(jsonText, _jsonSerializerOptions)
                 ?? throw new JsonException($"Can not convert json text to {typeof(Map)}");
 
             return map;

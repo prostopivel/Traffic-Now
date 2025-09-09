@@ -2,7 +2,6 @@
 {
     public record TransportResponse(
         Guid Id,
-        Guid UserId,
         Guid PointId,
         string Url,
         PointResponse Point,

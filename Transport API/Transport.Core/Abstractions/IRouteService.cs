@@ -11,5 +11,8 @@ namespace Transport.Application.Services
         Point? PeekPoint();
         bool HasNextPoint();
         void ClearRoute();
+        event GetGuid LastPointEvent;
     }
+
+    public delegate void GetGuid(Guid pointId);
 }

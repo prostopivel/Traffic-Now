@@ -30,7 +30,7 @@ namespace Traffic.Data.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Database connection failed");
+                _logger.LogWarning(ex, "Database connection failed");
                 return false;
             }
         }
@@ -59,6 +59,7 @@ namespace Traffic.Data.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Database initialization failed");
+                throw;
             }
         }
 

@@ -128,6 +128,16 @@ namespace Traffic.Data.Repositories
             }
         }
 
+        public async Task<Guid?> DeleteUserMap(Guid userId, Guid mapId)
+        {
+            const string sql = "SELECT delete_user_map(@UserId, @MapId)";
+            return await _connection.ExecuteScalarAsync<Guid>(sql, new
+            {
+                UserId = userId,
+                MapId = mapId
+            });
+        }
+
         public async Task<(Guid?, string Error)> CreateMapPointsAsync(IEnumerable<Point> points)
         {
             var Error = string.Empty;

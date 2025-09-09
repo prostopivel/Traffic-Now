@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,14 +16,11 @@ namespace Traffic.API.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
-        private readonly IConnectionTransportService _connectionTransportService;
 
-        public AuthController(IConfiguration configuration, IUserService userService,
-            IConnectionTransportService connectionTransportService)
+        public AuthController(IConfiguration configuration, IUserService userService)
         {
             _configuration = configuration;
             _userService = userService;
-            _connectionTransportService = connectionTransportService;
         }
 
         [HttpPost("login")]
@@ -65,6 +63,14 @@ namespace Traffic.API.Controllers
             var tokenString = GenerateJwtToken(user);
 
             return Ok(new { Token = tokenString });
+        }
+
+        [HttpGet("validate")]
+        [Authorize]
+        public IActionResult Validate()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Ok(new { userId, message = "Token is valid", ok = true });
         }
 
         private string GenerateJwtToken(Core.Models.User user)

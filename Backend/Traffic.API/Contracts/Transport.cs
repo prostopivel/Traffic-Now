@@ -6,4 +6,9 @@
         string Url,
         PointResponse Point,
         bool IsActive);
+
+    public record FirstTransportResponse(
+        double X,
+        double Y,
+        int Speed);
 }

@@ -2,9 +2,10 @@
 
 namespace Traffic.Core.DataStructures
 {
-    public class ConcurrentIndexedList<T> : IEnumerable<T>
+    public class ConcurrentIndexedSet<T> : IEnumerable<T>
     {
-        private readonly List<T> _list = [];
+        private readonly HashSet<T> _set = [];
+        private readonly List<T> _indexedList = [];
         private readonly ReaderWriterLockSlim _lock = new();
 
         public int Count
@@ -14,7 +15,7 @@ namespace Traffic.Core.DataStructures
                 _lock.EnterReadLock();
                 try
                 {
-                    return _list.Count;
+                    return _set.Count;
                 }
                 finally
                 {
@@ -23,12 +24,17 @@ namespace Traffic.Core.DataStructures
             }
         }
 
-        public void Add(T item)
+        public bool Add(T item)
         {
             _lock.EnterWriteLock();
             try
             {
-                _list.Add(item);
+                if (_set.Add(item))
+                {
+                    _indexedList.Add(item);
+                    return true;
+                }
+                return false;
             }
             finally
             {
@@ -43,7 +49,7 @@ namespace Traffic.Core.DataStructures
                 _lock.EnterReadLock();
                 try
                 {
-                    return _list[index];
+                    return _indexedList[index];
                 }
                 finally
                 {
@@ -57,7 +63,12 @@ namespace Traffic.Core.DataStructures
             _lock.EnterWriteLock();
             try
             {
-                return _list.Remove(item);
+                if (_set.Remove(item))
+                {
+                    _indexedList.Remove(item);
+                    return true;
+                }
+                return false;
             }
             finally
             {
@@ -70,10 +81,12 @@ namespace Traffic.Core.DataStructures
             _lock.EnterWriteLock();
             try
             {
-                if (index < 0 || index >= _list.Count)
+                if (index < 0 || index >= _indexedList.Count)
                     return false;
 
-                _list.RemoveAt(index);
+                var item = _indexedList[index];
+                _set.Remove(item);
+                _indexedList.RemoveAt(index);
                 return true;
             }
             finally
@@ -87,7 +100,7 @@ namespace Traffic.Core.DataStructures
             _lock.EnterReadLock();
             try
             {
-                return [.. _list];
+                return [.. _indexedList];
             }
             finally
             {
@@ -100,7 +113,7 @@ namespace Traffic.Core.DataStructures
             _lock.EnterReadLock();
             try
             {
-                return _list.Contains(item);
+                return _set.Contains(item);
             }
             finally
             {
@@ -113,7 +126,8 @@ namespace Traffic.Core.DataStructures
             _lock.EnterWriteLock();
             try
             {
-                _list.Clear();
+                _set.Clear();
+                _indexedList.Clear();
             }
             finally
             {
@@ -127,7 +141,7 @@ namespace Traffic.Core.DataStructures
             _lock.EnterReadLock();
             try
             {
-                copy = [.. _list];
+                copy = [.. _indexedList];
             }
             finally
             {

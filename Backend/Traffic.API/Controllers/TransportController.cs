@@ -124,6 +124,41 @@ namespace Traffic.API.Controllers
             return await GetUserTransportAsync();
         }
 
+        [HttpGet("getFirstTransport")]
+        [Authorize]
+        public async Task<IActionResult> GetUserFirstTransport()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
+            {
+                return Unauthorized(new { message = "Идентификатор не найден в токене" });
+            }
+
+            var transportData = _transportDataService[id].FirstOrDefault();
+
+            if (transportData.Value == null)
+            {
+                return Ok(null);
+            }
+
+            var transport = await _transportService.GetAsync(transportData.Key);
+
+            if (transport == null)
+            {
+                return Ok(null);
+            }
+
+             var speed = await _transportHttpConnection.GetTransportSpeed(transport.Url);
+
+            var response = ContractsFactory.CreateFirstTransportResponse(
+                transportData.Value.X,
+                transportData.Value.Y,
+                speed);
+
+            return Ok(response);
+        }
+
         [HttpGet("getMapTransport")]
         [Authorize]
         public async Task<IActionResult> GetUserMapTransport([FromQuery] Guid mapId)

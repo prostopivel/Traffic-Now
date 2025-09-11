@@ -10,14 +10,14 @@ namespace Traffic.Application.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ConcurrentDictionary<Guid, TransportData> _transportData = new();
-        private readonly ConcurrentDictionary<Guid, ConcurrentIndexedList<Guid>> _userTransport = new();
+        private readonly ConcurrentDictionary<Guid, ConcurrentIndexedSet<Guid>> _userTransport = new();
 
         public TransportDataService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public ConcurrentDictionary<Guid, ConcurrentIndexedList<Guid>> UserTransport => _userTransport;
+        public ConcurrentDictionary<Guid, ConcurrentIndexedSet<Guid>> UserTransport => _userTransport;
 
         public Dictionary<Guid, TransportData> this[Guid userId]
         {
@@ -87,6 +87,17 @@ namespace Traffic.Application.Services
                     {
                         _userTransport.TryRemove(userId, out _);
                     }
+                }
+            }
+        }
+
+        public async Task RemoveInactiveTransport()
+        {
+            foreach (var item in _transportData)
+            {
+                if (item.Value.LastUpdate < DateTime.Now.AddSeconds(-10))
+                {
+                    await RemoveTransport(item.Key);
                 }
             }
         }

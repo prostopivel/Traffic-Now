@@ -30,23 +30,15 @@
                         <i class="fas fa-map-marker-alt"></i>
                         <h3>Текущее местоположение</h3>
                     </div>
-                    <p id="currentPos">Ваш транспорт находится в районе центрального вокзала. Скорость: 45 км/ч</p>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-route"></i>
-                        <h3>Активный маршрут</h3>
-                    </div>
-                    <p id="currentRoute">Маршрут №12: Центральный вокзал → Южный район → Восточный терминал</p>
+                    <p id="currentPos"></p>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
                         <i class="fas fa-clock"></i>
-                        <h3>Статистика сегодня</h3>
+                        <h3>Текущая скорость</h3>
                     </div>
-                    <p id="currentTime">Пройдено: 124 км. В пути: 3 ч 45 мин. Осталось: 45 мин</p>
+                    <p id="currentSpeed"></p>
                 </div>
             </div>
             
@@ -62,7 +54,7 @@
                     Просмотр транспорта
                 </button>
                 
-                <button class="action-btn" onclick="window.location.replace('profile.html')">
+                <button class="action-btn" onclick="window.location.replace('userChange.html')">
                     <i class="fas fa-user-edit"></i>
                     Изменить профиль
                 </button>
@@ -76,5 +68,6 @@
     </div>
 
     <script src="js/utils.js"></script>
+    <script src="js/menu.js"></script>
 </body>
 </html>

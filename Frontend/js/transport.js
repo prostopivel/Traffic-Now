@@ -126,13 +126,17 @@ async function connectTransport() {
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Подключение...';
 
     try {
-        const result = await getProtectedData('transport/connect', 'POST', { url: url });
+        const result = await getProtectedData('transport/connect', 'POST', {
+            url: url
+        });
 
         setTimeout(async () => {
             showSuccess('Транспорт успешно подключен!');
             urlInput.value = '';
 
-            const newTransport = await getProtectedData('transport', 'GET', { transportId: result });
+            const newTransport = await getProtectedData('transport', 'GET', {
+                transportId: result
+            });
 
             allTransport.push(newTransport);
             renderTransport(allTransport);
@@ -160,7 +164,9 @@ async function deleteTransport(transportId, event) {
     }
 
     try {
-        await getProtectedData('transport/deleteUser', 'DELETE', { transportId: transportId });
+        await getProtectedData('transport/deleteUser', 'DELETE', {
+            transportId: transportId
+        });
 
         allTransport = allTransport.filter(t => t.id !== transportId);
         renderTransport(allTransport);

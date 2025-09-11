@@ -16,6 +16,7 @@ namespace Traffic.API
     public class Program
     {
         private const string DEFAULT_CONNECTION_STRING = "Host=localhost;Port=5432;Database=postgres_traffic;Username=traffic_user;Password=postgres";
+        private static readonly bool _printAuth = false;
 
         public static void Main(string[] args)
         {
@@ -84,13 +85,13 @@ namespace Traffic.API
 
         private static async Task ConfigureWebSocket(HttpContext context, Func<Task> next)
         {
-            if (context.Request.Path.StartsWithSegments("/transportClientHub"))
+            if (context.Request.Path.StartsWithSegments("/transportClientHub") && _printAuth)
             {
                 Console.WriteLine($"Hub request: {context.Request.Path}");
                 Console.WriteLine($"Query string: {context.Request.QueryString}");
 
                 var tokenFromQuery = context.Request.Query["access_token"];
-                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
 
                 Console.WriteLine($"Token from query: {!string.IsNullOrEmpty(tokenFromQuery)}");
                 Console.WriteLine($"Auth header: {!string.IsNullOrEmpty(authHeader)}");
@@ -173,12 +174,18 @@ namespace Traffic.API
                         if (!string.IsNullOrEmpty(accessToken))
                         {
                             context.Token = accessToken;
-                            Console.WriteLine($"Token from query: {accessToken.ToString()[..20]}...");
+                            if (_printAuth)
+                            {
+                                Console.WriteLine($"Token from query: {accessToken.ToString()[..20]}...");
+                            }
                         }
                         else if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
                         {
                             context.Token = authHeader["Bearer ".Length..];
-                            Console.WriteLine($"Token from header: {context.Token}...");
+                            if (_printAuth)
+                            {
+                                Console.WriteLine($"Token from header: {context.Token}...");
+                            }
                         }
 
                         return Task.CompletedTask;
@@ -190,7 +197,10 @@ namespace Traffic.API
                     },
                     OnTokenValidated = context =>
                     {
-                        Console.WriteLine($"Token validated for: {context.Principal?.Identity?.Name}");
+                        if (_printAuth)
+                        {
+                            Console.WriteLine($"Token validated for: {context.Principal?.Identity?.Name}");
+                        }
                         return Task.CompletedTask;
                     }
                 };

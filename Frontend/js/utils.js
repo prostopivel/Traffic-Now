@@ -30,6 +30,48 @@ async function getProtectedData(path, method, params = {}) {
         });
 
         if (response.ok) {
+            try {
+                const data = await response.json();
+                console.log('Data received successfully!');
+                return data;
+            }
+            catch {
+                return null;
+            }
+        } else {
+            if (response.status === 401 && errorMessage.includes('пароль')) {
+                const passwordIssue = document.getElementById('passwordIssue');
+                if (passwordIssue) {
+                    passwordIssue.textContent = errorMessage;
+                    passwordIssue.style.display = 'block';
+                    return;
+                }
+            }
+
+            redirectToError(response.status, errorMessage, response.statusText);
+        }
+    } catch (error) {
+        console.error('Request error:', error);
+        redirectToError('0', 'Ошибка соединения с сервером', 'Network Error');
+    }
+}
+
+async function getBodyProtectedData(path, method, params = {}) {
+    try {
+        const token = localStorage.getItem('jwtToken');
+
+        let url = 'https://localhost:7003/api/' + path;
+
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        });
+
+        if (response.ok) {
             const data = await response.json();
             console.log('Data received successfully!');
             return data;
@@ -80,7 +122,7 @@ function createSidebar() {
                 <a href="transport.html" id="nav-transport" class="nav-item">
                     <i class="fas fa-bus"></i> Просмотр транспорта
                 </a>
-                <a href="#" id="nav-profile" class="nav-item">
+                <a href="userChange.html" id="nav-profile" class="nav-item">
                     <i class="fas fa-user-cog"></i> Изменение информации
                 </a>
                 <a href="#" id="nav-history" class="nav-item">
@@ -95,7 +137,7 @@ function createSidebar() {
             </div>
         </div>
     `;
-    
+
     const container = document.getElementById('sidebar-container');
     if (container) {
         container.innerHTML = sidebarHTML;
@@ -107,9 +149,9 @@ function createSidebar() {
 function setActiveNavItem() {
     const currentPage = window.location.pathname.split('/').pop();
     const pageTitle = document.title.toLowerCase();
-    
+
     let activeNavId = '';
-    
+
     if (currentPage === 'menu.html' || pageTitle.includes('панель') || pageTitle.includes('главная')) {
         activeNavId = 'nav-menu';
     } else if (currentPage === 'userMaps.html' || currentPage === 'map.html' || pageTitle.includes('карт') || pageTitle.includes('map')) {
@@ -125,17 +167,17 @@ function setActiveNavItem() {
     } else if (pageTitle.includes('настройк') || pageTitle.includes('settings') || pageTitle.includes('cog')) {
         activeNavId = 'nav-settings';
     }
-    
+
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         item.classList.remove('active');
     });
-    
+
     if (activeNavId) {
         const activeNav = document.getElementById(activeNavId);
         if (activeNav) {
             activeNav.classList.add('active');
-            
+
             const icon = activeNav.querySelector('i');
             if (icon) {
                 icon.style.color = '#667eea';
@@ -147,17 +189,17 @@ function setActiveNavItem() {
 function applySidebarStyles() {
     const container = document.getElementById('sidebar-container');
     const sidebar = document.querySelector('.sidebar');
-    
+
     if (container && sidebar) {
         container.style.height = '100vh';
         container.style.position = 'sticky';
         container.style.top = '0';
-        
+
         sidebar.style.height = '100%';
         sidebar.style.minHeight = '100vh';
         sidebar.style.display = 'flex';
         sidebar.style.flexDirection = 'column';
-        
+
         const navItems = document.querySelector('.nav-items');
         if (navItems) {
             navItems.style.flexGrow = '1';
@@ -167,22 +209,22 @@ function applySidebarStyles() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     createSidebar();
 });
 
 window.addEventListener('resize', applySidebarStyles);
 
 let lastTitle = document.title;
-const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
+const observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'title') {
             setActiveNavItem();
         }
     });
 });
 
-observer.observe(document.querySelector('title'), { 
+observer.observe(document.querySelector('title'), {
     attributes: true,
     attributeFilter: ['title']
 });

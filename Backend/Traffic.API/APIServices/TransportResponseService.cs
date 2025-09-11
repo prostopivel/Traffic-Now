@@ -12,6 +12,8 @@ namespace Traffic.API.APIServices
         private readonly ILogger<TransportResponseService> _logger;
         private readonly PeriodicTimer _responseTimer = new(TimeSpan.FromSeconds(2));
 
+        private byte _checkedTimes = 0;
+
         public TransportResponseService(IHubContext<TransportClientHub> hubClientContext,
             ITransportDataService transportDataService, ILogger<TransportResponseService> logger)
         {
@@ -25,6 +27,13 @@ namespace Traffic.API.APIServices
             while (await _responseTimer.WaitForNextTickAsync(stoppingToken))
             {
                 await ResponseData();
+
+                _checkedTimes++;
+                if (_checkedTimes >= 5)
+                {
+                    _checkedTimes -= 5;
+                    await _transportDataService.RemoveInactiveTransport();
+                }
             }
         }
 

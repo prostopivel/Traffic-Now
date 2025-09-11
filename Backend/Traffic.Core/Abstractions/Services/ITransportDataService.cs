@@ -6,10 +6,11 @@ namespace Traffic.Application.Services
 {
     public interface ITransportDataService
     {
-        ConcurrentDictionary<Guid, ConcurrentIndexedList<Guid>> UserTransport { get; }
+        ConcurrentDictionary<Guid, ConcurrentIndexedSet<Guid>> UserTransport { get; }
         Dictionary<Guid, TransportData> this[Guid userId] { get; }
         Task AddTransport(Guid transportId, TransportData data);
         Task AddUser(Guid userId, Guid transportId);
+        Task RemoveInactiveTransport();
         Task RemoveTransport(Guid transportId);
         Task RemoveTransportUser(Guid userId, Guid transportId);
     }

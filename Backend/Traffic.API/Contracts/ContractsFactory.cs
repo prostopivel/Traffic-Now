@@ -69,6 +69,16 @@ namespace Traffic.API.Contracts
             return transportResponse;
         }
 
+        public static FirstTransportResponse CreateFirstTransportResponse(double x, double y, int speed)
+        {
+            var firstTransportResponse = new FirstTransportResponse(
+                x,
+                y,
+                speed);
+
+            return firstTransportResponse;
+        }
+
         public static (Core.Models.Route?, string Error) CreateRoute(RouteRequest routeRequest)
         {
             (var route, var Error) = Core.Models.Route.Create(

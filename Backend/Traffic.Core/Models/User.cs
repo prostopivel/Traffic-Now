@@ -14,7 +14,7 @@ namespace Traffic.Core.Models
 
         public string Email { get; } = string.Empty;
 
-        public string Password { get; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
 
         public bool IsAdmin { get; }
 

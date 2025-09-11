@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     loadMapData();
     updateMapInteractions();
 
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         renderMap(currentMap);
     });
 });
@@ -29,11 +29,13 @@ async function loadMapData() {
         }
 
         const mapId = localStorage.getItem('map');
-        const map = await getProtectedData('map', 'GET', { id: mapId });
+        const map = await getProtectedData('map', 'GET', {
+            id: mapId
+        });
         currentMap = map;
-        
+
         await loadMapTransport(mapId);
-        
+
         renderMap(map);
         initializeSignalRConnection();
     } catch (error) {
@@ -53,7 +55,9 @@ async function validateToken() {
 
 async function loadMapTransport(mapId) {
     try {
-        const transports = await getProtectedData('transport/getMapTransport', 'GET', { mapId: mapId });
+        const transports = await getProtectedData('transport/getMapTransport', 'GET', {
+            mapId: mapId
+        });
         mapTransports = transports;
         updateTransportCount();
     } catch (error) {
@@ -63,21 +67,21 @@ async function loadMapTransport(mapId) {
 
 function initializeSignalRConnection() {
     const token = localStorage.getItem('jwtToken');
-    
+
     if (!token) {
         console.error('No authentication token found');
         setTimeout(initializeSignalRConnection, 5000);
         return;
     }
-    
+
     console.log('Initializing SignalR with token:', token.substring(0, 20) + '...');
-    
+
     hubConnection = new signalR.HubConnectionBuilder()
         .withUrl('https://localhost:7003/transportClientHub', {
             accessTokenFactory: () => token
         })
         .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
-        .configureLogging(signalR.LogLevel.Debug) 
+        .configureLogging(signalR.LogLevel.Debug)
         .build();
 
     hubConnection.on('TransportMapData', (transportDataList) => {
@@ -122,7 +126,7 @@ function initializeSignalRConnection() {
 
 async function getValidToken() {
     let token = localStorage.getItem('jwtToken');
-    
+
     if (token) {
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
@@ -135,7 +139,7 @@ async function getValidToken() {
             console.error('Error parsing token:', e);
         }
     }
-    
+
     return token;
 }
 
@@ -148,7 +152,7 @@ async function refreshToken() {
             },
             credentials: 'include'
         });
-        
+
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem('token', data.token);
@@ -167,19 +171,11 @@ function updateTransportPositions(transportDataList) {
             transport.point.x = transportData.x;
             transport.point.y = transportData.y;
             transport.isActive = true;
-            
+
             updateTransportElement(transport);
-        } else {
-            const newTransport = {
-                id: transportData.transportId,
-                point: { x: transportData.x, y: transportData.y },
-                isActive: true
-            };
-            mapTransports.push(newTransport);
-            addTransportElement(newTransport);
         }
     });
-    
+
     const receivedTransportIds = transportDataList.map(t => t.transportId);
     mapTransports.forEach(transport => {
         if (!receivedTransportIds.includes(transport.id) && transport.isActive) {
@@ -187,7 +183,7 @@ function updateTransportPositions(transportDataList) {
             updateTransportElement(transport);
         }
     });
-    
+
     updateTransportCount();
 }
 
@@ -196,7 +192,7 @@ function updateTransportElement(transport) {
     if (transportElement) {
         transportElement.style.left = `${transport.point.x}%`;
         transportElement.style.top = `${transport.point.y}%`;
-        
+
         if (transport.isActive) {
             transportElement.classList.add('active');
             transportElement.classList.remove('inactive');
@@ -212,14 +208,14 @@ function updateTransportElement(transport) {
 function addTransportElement(transport) {
     const mapCanvas = document.getElementById('mapCanvas');
     const contentContainer = mapCanvas.querySelector('.map-content');
-    
+
     if (contentContainer) {
         const transportElement = document.createElement('div');
         transportElement.className = 'map-transport';
         transportElement.style.left = `${transport.point.x}%`;
         transportElement.style.top = `${transport.point.y}%`;
         transportElement.dataset.transportId = transport.id;
-        
+
         if (transport.isActive) {
             transportElement.classList.add('active');
         } else {
@@ -285,7 +281,7 @@ function renderMap(mapData) {
 
 function renderTransports(container) {
     transportElements.clear();
-    
+
     mapTransports.forEach(transport => {
         if (transport.point) {
             const transportElement = document.createElement('div');
@@ -293,7 +289,7 @@ function renderTransports(container) {
             transportElement.style.left = `${transport.point.x}%`;
             transportElement.style.top = `${transport.point.y}%`;
             transportElement.dataset.transportId = transport.id;
-            
+
             if (transport.isActive) {
                 transportElement.classList.add('active');
             } else {
@@ -314,6 +310,16 @@ function renderTransports(container) {
                 selectTransport(transport);
             });
 
+            transportElement.addEventListener('mouseenter', function () {
+                transportElement.style.zIndex = '100';
+            });
+
+            transportElement.addEventListener('mouseleave', function () {
+                if (!transportElement.classList.contains('active')) {
+                    transportElement.style.zIndex = '10';
+                }
+            });
+
             container.appendChild(transportElement);
             transportElements.set(transport.id, transportElement);
         }
@@ -321,22 +327,22 @@ function renderTransports(container) {
 }
 
 function selectTransport(transport) {
-    document.getElementById('pointInfo').textContent = 
+    document.getElementById('pointInfo').textContent =
         `Транспорт: ${transport.id.substring(0, 8)} | Статус: ${transport.isActive ? 'Активен' : 'Неактивен'}`;
 }
 
 function updateTransportCount() {
     const activeCount = mapTransports.filter(t => t.isActive).length;
-    document.getElementById('activeTransportCount').textContent = 
+    document.getElementById('activeTransportCount').textContent =
         `${activeCount} / ${mapTransports.length}`;
 }
 
 function toggleTransportVisibility() {
     showTransport = !showTransport;
-    
+
     const toggleIcon = document.getElementById('transportToggleIcon');
     const toggleText = document.getElementById('transportToggleText');
-    
+
     if (showTransport) {
         toggleIcon.className = 'fas fa-bus';
         toggleText.textContent = 'Скрыть транспорт';
@@ -406,21 +412,21 @@ function renderPoint(point, container) {
 
     pointElement.addEventListener('click', function (e) {
         e.stopPropagation();
-        
+
         document.querySelectorAll('.map-point.active').forEach(point => {
             point.classList.remove('active');
         });
-        
+
         pointElement.classList.add('active');
-        
+
         selectPoint(point);
     });
 
-    pointElement.addEventListener('mouseenter', function() {
+    pointElement.addEventListener('mouseenter', function () {
         pointElement.style.zIndex = '100';
     });
-    
-    pointElement.addEventListener('mouseleave', function() {
+
+    pointElement.addEventListener('mouseleave', function () {
         if (!pointElement.classList.contains('active')) {
             pointElement.style.zIndex = '10';
         }
@@ -453,14 +459,16 @@ function refreshMap() {
 
 async function downloadMap() {
     try {
-        const response = await getProtectedData('map/exportMap', 'GET', { mapId: currentMap.id });
-        
+        const response = await getProtectedData('map/exportMap', 'GET', {
+            mapId: currentMap.id
+        });
+
         console.log('Тип ответа:', typeof response);
         console.log('Ответ:', response);
-        
+
         let content;
         let filename = currentMap.name;
-        
+
         if (typeof response === 'string') {
             try {
                 JSON.parse(response);
@@ -474,9 +482,9 @@ async function downloadMap() {
         } else {
             content = String(response);
         }
-        
+
         downloadContent(content, filename, 'application/json');
-        
+
     } catch (error) {
         console.error('Ошибка:', error);
         alert('Не удалось скачать карту');
@@ -486,16 +494,16 @@ async function downloadMap() {
 function downloadContent(content, filename, contentType) {
     const blob = new Blob([content], { type: contentType });
     const url = URL.createObjectURL(blob);
-    
+
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
     link.style.display = 'none';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
@@ -585,7 +593,7 @@ function endDrag() {
     mapCanvas.style.cursor = 'grab';
 }
 
-window.addEventListener('beforeunload', function() {
+window.addEventListener('beforeunload', function () {
     if (hubConnection) {
         hubConnection.stop();
     }

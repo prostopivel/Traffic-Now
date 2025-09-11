@@ -332,7 +332,9 @@ async function deleteMap(transportId, event) {
     }
 
     try {
-        await getProtectedData('map/deleteMap', 'DELETE', { transportId: transportId });
+        await getProtectedData('map/deleteMap', 'DELETE', {
+            transportId: transportId
+        });
 
         allTransport = allTransport.filter(t => t.id !== transportId);
         renderMaps(allMaps);

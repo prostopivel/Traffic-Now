@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrafficNow - Управление транспортом</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/transport.css">
@@ -20,7 +21,7 @@
         <div class="main-content">
             <div class="content-header">
                 <h1><i class="fas fa-bus"></i>Управление транспортом</h1>
-                <button class="logout-btn" onclick="logout()">
+                <button class="logout-btn" id="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Выйти
                 </button>
             </div>
@@ -37,7 +38,7 @@
                 <div class="url-input-container">
                     <i class="fas fa-link"></i>
                     <input type="text" id="transportUrl" class="url-input" placeholder="Введите URL GPS сервера транспорта...">
-                    <button id="addTransportBtn" class="add-transport-btn" onclick="connectTransport()">
+                    <button id="addTransportBtn" class="add-transport-btn">
                         <i class="fas fa-plus"></i> Подключить
                     </button>
                 </div>
@@ -46,8 +47,8 @@
         </div>
     </div>
 
-    <script src="js/utils.js"></script>
-    <script src="js/transport.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/transport.js"></script>
 </body>
 
 </html>

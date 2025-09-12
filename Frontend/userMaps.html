@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrafficNow - Управление картами</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/userMaps.css">
@@ -20,7 +21,7 @@
         <div class="main-content">
             <div class="content-header">
                 <h1><i class="fas fa-map-marked-alt"></i>Управление картами</h1>
-                <button class="logout-btn" onclick="logout()">
+                <button class="logout-btn" id="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Выйти
                 </button>
             </div>
@@ -37,9 +38,8 @@
                 <div class="search-container">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="mapSearch" placeholder="Поиск карты по названию..."
-                            oninput="searchMaps()">
-                        <button class="clear-search" onclick="clearSearch()" title="Очистить поиск">
+                        <input type="text" id="mapSearch" placeholder="Поиск карты по названию...">
+                        <button class="clear-search" id="clear-search" title="Очистить поиск">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -50,8 +50,8 @@
         </div>
     </div>
 
-    <script src="js/utils.js"></script>
-    <script src="js/userMaps.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/userMaps.js"></script>
 </body>
 
 </html>

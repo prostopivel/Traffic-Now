@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficNow - Настройки</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <!-- Иконочный шрифт для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Боковое меню -->
+        <div class="sidebar-container" id="sidebar-container"></div>
+        
+        <!-- Основной контент -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1><i class="fas fa-cog"></i> Настройки</h1>
+                <button class="back-btn" onclick="window.location.replace('menu.html')">
+                    <i class="fas fa-arrow-left"></i> Назад
+                </button>
+            </div>
+            
+            <!-- Секция выбора темы -->
+            <div class="settings-section">
+                <h2><i class="fas fa-paint-brush"></i> Тема оформления</h2>
+                <div class="theme-options">
+                    <div class="theme-option active" data-theme="light" id="setTheme-light">
+                        <i class="fas fa-sun"></i>
+                        <p>Светлая тема</p>
+                    </div>
+                    <div class="theme-option" data-theme="dark" id="setTheme-dark">
+                        <i class="fas fa-moon"></i>
+                        <p>Темная тема</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Секция выбора иконки транспорта -->
+            <div class="settings-section">
+                <h2><i class="fas fa-bus"></i> Иконка транспорта</h2>
+                <p>Выберите иконку, которая будет отображаться для вашего транспорта на карте:</p><br/>
+                <div class="icon-grid" id="transport-icons">
+                    <div class="icon-option active" id="bus" data-icon="bus">
+                        <i class="fas fa-bus"></i>
+                        <span>Автобус</span>
+                    </div>
+                    <div class="icon-option" id="car" data-icon="car">
+                        <i class="fas fa-car"></i>
+                        <span>Авто</span>
+                    </div>
+                    <div class="icon-option" id="truck" data-icon="truck">
+                        <i class="fas fa-truck"></i>
+                        <span>Грузовик</span>
+                    </div>
+                    <div class="icon-option" id="ship" data-icon="ship">
+                        <i class="fas fa-ship"></i>
+                        <span>Корабль</span>
+                    </div>
+                    <div class="icon-option" id="bicycle" data-icon="bicycle">
+                        <i class="fas fa-bicycle"></i>
+                        <span>Велосипед</span>
+                    </div>
+                    <div class="icon-option" id="motorcycle" data-icon="motorcycle">
+                        <i class="fas fa-motorcycle"></i>
+                        <span>Мотоцикл</span>
+                    </div>
+                    <div class="icon-option" id="train" data-icon="train">
+                        <i class="fas fa-train"></i>
+                        <span>Поезд</span>
+                    </div>
+                    <div class="icon-option" id="subway" data-icon="subway">
+                        <i class="fas fa-subway"></i>
+                        <span>Метро</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Секция удаления профиля -->
+            <div class="settings-section danger-zone">
+                <h2><i class="fas fa-exclamation-triangle"></i> Опасная зона</h2>
+                <p>Удаление вашего профиля приведет к безвозвратному удалению всех ваших данных. Это действие нельзя отменить.</p><br/>
+                <button class="delete-btn" id="delete-btn">
+                    <i class="fas fa-trash-alt"></i> Удалить профиль
+                </button>
+                
+                <div class="confirmation" id="deleteConfirmation">
+                    <p>Вы уверены, что хотите удалить свой профиль? Все ваши данные будут безвозвратно удалены.</p>
+                    <div class="confirmation-buttons">
+                        <button class="delete-btn" id="delete-profile-btn">
+                            <i class="fas fa-check"></i> Да, удалить
+                        </button>
+                        <button class="cancel-btn" id="hide-btn">
+                            <i class="fas fa-times"></i> Отмена
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/settings.js"></script>
+</body>
+</html>

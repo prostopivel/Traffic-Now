@@ -1,3 +1,5 @@
+import { serverPath, logout, getProtectedData } from "./utils.js";
+
 let currentMap = null;
 let showConnections = true;
 let showTransport = true;
@@ -18,6 +20,14 @@ document.addEventListener('DOMContentLoaded', function () {
         renderMap(currentMap);
     });
 });
+
+document.getElementById('logout-btn').addEventListener('click', logout);
+document.getElementById('toggleConnections-btn').addEventListener('click', toggleConnections);
+document.getElementById('toggleTransportVisibility-btn').addEventListener('click', toggleTransportVisibility);
+document.getElementById('refreshMap-btn').addEventListener('click', refreshMap);
+document.getElementById('downloadMap-btn').addEventListener('click', downloadMap);
+document.getElementById('zoomIn-btn').addEventListener('click', zoomIn);
+document.getElementById('zoomOut-btn').addEventListener('click', zoomOut);
 
 async function loadMapData() {
     try {
@@ -77,7 +87,7 @@ function initializeSignalRConnection() {
     console.log('Initializing SignalR with token:', token.substring(0, 20) + '...');
 
     hubConnection = new signalR.HubConnectionBuilder()
-        .withUrl('https://localhost:7003/transportClientHub', {
+        .withUrl(serverPath + 'transportClientHub', {
             accessTokenFactory: () => token
         })
         .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
@@ -145,7 +155,7 @@ async function getValidToken() {
 
 async function refreshToken() {
     try {
-        const response = await fetch('https://localhost:7003/api/auth/refresh', {
+        const response = await fetch(serverPath + 'api/auth/refresh', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -297,7 +307,8 @@ function renderTransports(container) {
             }
 
             const icon = document.createElement('i');
-            icon.className = 'fas fa-bus';
+            const iconName = localStorage.getItem('transportIcon');
+            icon.className = 'fas fa-' + iconName;
             transportElement.appendChild(icon);
 
             const label = document.createElement('div');

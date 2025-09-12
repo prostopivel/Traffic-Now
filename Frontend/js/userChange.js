@@ -1,3 +1,5 @@
+import { logout, getProtectedData } from "./utils.js";
+
 document.addEventListener('DOMContentLoaded', function () {
     loadUserData();
 
@@ -19,6 +21,11 @@ document.addEventListener('DOMContentLoaded', function () {
         hideIssue('confirmPasswordIssue');
     });
 });
+
+document.getElementById('logout-btn').addEventListener('click', logout);
+document.getElementById('current-password').addEventListener('click', () => togglePassword('currentPassword', this));
+document.getElementById('new-password').addEventListener('click', () => togglePassword('newPassword', this));
+document.getElementById('repeat-password').addEventListener('click', () => togglePassword('confirmPassword', this));
 
 async function loadUserData() {
     const user = await getProtectedData('auth', 'GET');

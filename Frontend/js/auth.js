@@ -1,3 +1,10 @@
+import { serverPath, hashPassword, redirectToError } from "./utils.js";
+
+document.getElementById('login-btn')?.addEventListener('click', login);
+document.getElementById('authorize-btn')?.addEventListener('click', authorize);
+document.getElementById('password')?.addEventListener('input', checkPasswordMatch);
+document.getElementById('confirmPassword')?.addEventListener('input', checkPasswordMatch);
+
 async function login() {
     const username = document.getElementById('Email').value;
     const password = document.getElementById('password').value;
@@ -10,7 +17,7 @@ async function login() {
             passwordIssue.style.display = 'none';
         }
 
-        const response = await fetch('https://localhost:7003/api/auth/login', {
+        const response = await fetch(serverPath + 'api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -68,6 +75,27 @@ async function login() {
     }
 }
 
+function checkPasswordMatch() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword')?.value;
+    const match = document.getElementById('passwordMatch');
+    const mismatch = document.getElementById('passwordMismatch');
+
+    if (password === '' || confirmPassword === '') {
+        match.style.display = 'none';
+        mismatch.style.display = 'none';
+        return;
+    }
+
+    if (match && mismatch && password === confirmPassword) {
+        match.style.display = 'block';
+        mismatch.style.display = 'none';
+    } else if (match && mismatch) {
+        match.style.display = 'none';
+        mismatch.style.display = 'block';
+    }
+}
+
 async function authorize() {
     const username = document.getElementById('Email').value;
     const password = document.getElementById('password').value;
@@ -82,7 +110,7 @@ async function authorize() {
 
         const hashedPassword = await hashPassword(password);
 
-        const response = await fetch('https://localhost:7003/api/auth/authorize', {
+        const response = await fetch(serverPath + 'api/auth/authorize', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

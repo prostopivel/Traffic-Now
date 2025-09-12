@@ -1,4 +1,19 @@
-async function hashPassword(password) {
+export const serverPath = 'https://localhost:7003/';
+
+function loadTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    changeTheme(savedTheme);
+}
+
+export function changeTheme(theme) {
+    if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+}
+
+export async function hashPassword(password) {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
 
@@ -10,11 +25,11 @@ async function hashPassword(password) {
     return hashHex;
 }
 
-async function getProtectedData(path, method, params = {}) {
+export async function getProtectedData(path, method, params = {}) {
     try {
         const token = localStorage.getItem('jwtToken');
 
-        let url = 'https://localhost:7003/api/' + path;
+        let url = serverPath + 'api/' + path;
 
         if (Object.keys(params).length > 0) {
             const queryParams = new URLSearchParams(params).toString();
@@ -56,11 +71,11 @@ async function getProtectedData(path, method, params = {}) {
     }
 }
 
-async function getBodyProtectedData(path, method, params = {}) {
+export async function getBodyProtectedData(path, method, params = {}) {
     try {
         const token = localStorage.getItem('jwtToken');
 
-        let url = 'https://localhost:7003/api/' + path;
+        let url = serverPath + 'api/' + path;
 
         const response = await fetch(url, {
             method: method,
@@ -93,12 +108,12 @@ async function getBodyProtectedData(path, method, params = {}) {
     }
 }
 
-function redirectToError(errorCode, errorMessage, errorStatus) {
+export function redirectToError(errorCode, errorMessage, errorStatus) {
     const message = encodeURIComponent(errorMessage);
     window.location.href = `error.html?code=${errorCode}&message=${message}&status=${errorStatus}`;
 }
 
-function logout() {
+export function logout() {
     if (confirm("Вы уверены, что хотите выйти?")) {
         console.log("Пользователь вышел из системы");
         window.location.href = "index.html";
@@ -122,16 +137,10 @@ function createSidebar() {
                 <a href="transport.html" id="nav-transport" class="nav-item">
                     <i class="fas fa-bus"></i> Просмотр транспорта
                 </a>
-                <a href="userChange.html" id="nav-profile" class="nav-item">
+                <a href="userChange.html" id="nav-userChange" class="nav-item">
                     <i class="fas fa-user-cog"></i> Изменение информации
                 </a>
-                <a href="#" id="nav-history" class="nav-item">
-                    <i class="fas fa-history"></i> История поездок
-                </a>
-                <a href="#" id="nav-analytics" class="nav-item">
-                    <i class="fas fa-chart-line"></i> Аналитика
-                </a>
-                <a href="#" id="nav-settings" class="nav-item">
+                <a href="settings.html" id="nav-settings" class="nav-item">
                     <i class="fas fa-cog"></i> Настройки
                 </a>
             </div>
@@ -158,12 +167,8 @@ function setActiveNavItem() {
         activeNavId = 'nav-maps';
     } else if (currentPage === 'transport.html' || pageTitle.includes('транспорт') || pageTitle.includes('transport') || pageTitle.includes('bus')) {
         activeNavId = 'nav-transport';
-    } else if (pageTitle.includes('профиль') || pageTitle.includes('profile') || pageTitle.includes('информация')) {
-        activeNavId = 'nav-profile';
-    } else if (pageTitle.includes('история') || pageTitle.includes('history')) {
-        activeNavId = 'nav-history';
-    } else if (pageTitle.includes('аналитика') || pageTitle.includes('analytics') || pageTitle.includes('chart')) {
-        activeNavId = 'nav-analytics';
+    } else if (pageTitle.includes('изменение') || pageTitle.includes('userChange') || pageTitle.includes('информации')) {
+        activeNavId = 'nav-userChange';
     } else if (pageTitle.includes('настройк') || pageTitle.includes('settings') || pageTitle.includes('cog')) {
         activeNavId = 'nav-settings';
     }
@@ -180,7 +185,11 @@ function setActiveNavItem() {
 
             const icon = activeNav.querySelector('i');
             if (icon) {
-                icon.style.color = '#667eea';
+                if (localStorage.getItem('theme') == 'dark') {
+                    icon.style.color = '#ecf0f1';
+                } else {
+                    icon.style.color = '#667eea';
+                }
             }
         }
     }
@@ -211,6 +220,7 @@ function applySidebarStyles() {
 
 document.addEventListener('DOMContentLoaded', function () {
     createSidebar();
+    loadTheme();
 });
 
 window.addEventListener('resize', applySidebarStyles);

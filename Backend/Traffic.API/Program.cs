@@ -23,6 +23,22 @@ namespace Traffic.API
             var builder = WebApplication.CreateBuilder(args);
             var connectionString = builder.Configuration.GetConnectionString("PostgreSQL")
                 ?? DEFAULT_CONNECTION_STRING;
+            var httpPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") ?? "7002";
+            var httpsPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS") ?? "7003";
+
+            builder.WebHost.ConfigureKestrel(serverOptions =>
+            {
+                serverOptions.ListenAnyIP(int.Parse(httpPort), options =>
+                {
+                    Console.WriteLine($"HTTP server listening on port {httpPort}");
+                });
+
+                serverOptions.ListenAnyIP(int.Parse(httpsPort), listenOptions =>
+                {
+                    listenOptions.UseHttps();
+                    Console.WriteLine($"HTTPS server listening on port {httpsPort}");
+                });
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddControllers();
@@ -66,10 +82,22 @@ namespace Traffic.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
 
             app.Use(ConfigureWebSocket);
-
             app.UseCors("AllowSpecificOrigins");
+            app.Lifetime.ApplicationStarted.Register(() =>
+            {
+                var logger = app.Services.GetRequiredService<ILogger<Program>>();
+                logger.LogInformation("Application started");
+                logger.LogInformation("HTTP port: {HttpPort}", httpPort);
+                logger.LogInformation("HTTPS port: {HttpsPort}", httpsPort);
+                logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
+            });
 
             app.UseHttpsRedirection();
             app.UseAuthentication();

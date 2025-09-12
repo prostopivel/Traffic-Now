@@ -1,8 +1,20 @@
+import { logout, getProtectedData } from "./utils.js";
+
 let allTransport = [];
 
 document.addEventListener('DOMContentLoaded', function () {
     loadTransport();
+
+    const elements = document.getElementsByClassName('delete-transport-btn');
+    for (let el of elements) {
+        el.addEventListener('click', () => {
+            deleteTransport(el.id);
+        });
+    }
 });
+
+document.getElementById('logout-btn').addEventListener('click', logout);
+document.getElementById('addTransportBtn').addEventListener('click', connectTransport);
 
 async function loadTransport() {
     try {
@@ -98,7 +110,7 @@ function createTransportCard(transport) {
                     </div>
                 </div>
                 <div class="transport-actions">
-                    <button class="delete-transport-btn" onclick="deleteTransport('${transport.id}', event)">
+                    <button class="delete-transport-btn" id="${transport.id}">
                         <i class="fas fa-trash"></i> Удалить
                     </button>
                 </div>

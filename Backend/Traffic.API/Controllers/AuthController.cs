@@ -111,6 +111,15 @@ namespace Traffic.API.Controllers
             return Ok(new { Ok = true });
         }
 
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> DeleteUser([FromQuery] Guid userId)
+        {
+            var id = await _userService.DeleteAsync(userId);
+
+            return Ok(new { ok = true });
+        }
+
         private string GenerateJwtToken(Core.Models.User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

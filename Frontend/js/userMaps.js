@@ -1,3 +1,5 @@
+import { logout, getProtectedData } from "./utils.js";
+
 let allMaps = [];
 let searchTimeout = null;
 
@@ -15,10 +17,44 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         renderMaps(allMaps);
     });
+
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-map-btn-search') ||
+            event.target.closest('.add-map-btn-search')) {
+
+            const button = event.target.classList.contains('add-map-btn-search')
+                ? event.target
+                : event.target.closest('.add-map-btn-search');
+
+            if (button.disabled) return;
+
+            const id = button.id.replace('add-map-btn-search-', '');
+            addMapToUser(id);
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('delete-map-btn') ||
+            event.target.closest('.delete-map-btn')) {
+
+            const button = event.target.classList.contains('delete-map-btn')
+                ? event.target
+                : event.target.closest('.delete-map-btn');
+
+            if (button.disabled) return;
+
+            const id = button.id.replace('delete-map-btn-', '');
+            deleteMap(id, event);
+        }
+    });
 });
+
+document.getElementById('logout-btn').addEventListener('click', logout);
+document.getElementById('clear-search').addEventListener('click', clearSearch);
+document.getElementById('mapSearch').addEventListener('input', searchMaps);
 
 async function loadMaps() {
     try {
@@ -107,8 +143,8 @@ function displaySearchResults(maps) {
                         </div>
                     </div>
                 </div>
-                <button class="add-map-btn-search" 
-                        onclick="addMapToUser('${map.id}')"
+                <button class="add-map-btn-search"
+                        id="add-map-btn-search-${map.id}"
                         ${isAlreadyAdded ? 'disabled' : ''}>
                     ${isAlreadyAdded ? 'Добавлена' : 'Добавить'}
                 </button>
@@ -206,12 +242,11 @@ function createMapCard(map) {
             </div>
         </div>
         <div class="map-actions">
-            <button class="delete-map-btn" onclick="deleteMap('${map.id}', event)">
+            <button class="delete-map-btn" id="delete-map-btn-${map.id}">
                 <i class="fas fa-trash"></i> Удалить
             </button>
         </div>
     `;
-
     setTimeout(() => renderMapPreview(map, card), 100);
 
     return card;
@@ -312,14 +347,6 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
-
-function showSuccess(message) {
-    alert('✓ ' + message);
-}
-
-function showError(message) {
-    alert('✗ ' + message);
 }
 
 async function deleteMap(transportId, event) {

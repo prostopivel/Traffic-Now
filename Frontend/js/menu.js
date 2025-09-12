@@ -1,6 +1,10 @@
+import { logout, getProtectedData } from "./utils.js";
+
 document.addEventListener('DOMContentLoaded', function () {
     getStats();
 });
+
+document.getElementById('logout-btn').addEventListener('click', logout);
 
 async function getStats() {
     const taransport = await getProtectedData('transport/getFirstTransport', 'GET');

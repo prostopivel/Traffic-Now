@@ -26,20 +26,13 @@ namespace Traffic.API
             var builder = WebApplication.CreateBuilder(args);
             var connectionString = builder.Configuration.GetConnectionString("PostgreSQL")
                 ?? DEFAULT_CONNECTION_STRING;
-            var httpPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") ?? "7002";
-            var httpsPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS") ?? "7003";
 
             builder.WebHost.ConfigureKestrel(serverOptions =>
             {
+                var httpPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") ?? "7002";
                 serverOptions.ListenAnyIP(int.Parse(httpPort), options =>
                 {
                     Console.WriteLine($"HTTP server listening on port {httpPort}");
-                });
-
-                serverOptions.ListenAnyIP(int.Parse(httpsPort), listenOptions =>
-                {
-                    listenOptions.UseHttps();
-                    Console.WriteLine($"HTTPS server listening on port {httpsPort}");
                 });
             });
 
@@ -88,7 +81,6 @@ namespace Traffic.API
             else
             {
                 app.UseExceptionHandler("/Error");
-                //app.UseHsts();
             }
 
             app.Use(ConfigureWebSocket);
@@ -97,12 +89,9 @@ namespace Traffic.API
             {
                 var logger = app.Services.GetRequiredService<ILogger<Program>>();
                 logger.LogInformation("Application started");
-                logger.LogInformation("HTTP port: {HttpPort}", httpPort);
-                logger.LogInformation("HTTPS port: {HttpsPort}", httpsPort);
                 logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
             });
 
-            app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
@@ -138,13 +127,16 @@ namespace Traffic.API
             {
                 options.AddPolicy("AllowSpecificOrigins", policy =>
                 {
+                    var renderUrl = Environment.GetEnvironmentVariable("RENDER_EXTERNAL_URL") ?? "https://your-service-name.onrender.com";
+
                     policy.WithOrigins(
                             "https://localhost:7003",
                             "http://localhost:3000",
                             "http://127.0.0.1:3000",
                             "http://localhost:3001",
                             "http://127.0.0.1:3001",
-                            "null"
+                            "null",
+                            renderUrl
                         )
                         .AllowAnyMethod()
                         .AllowAnyHeader()
@@ -200,24 +192,15 @@ namespace Traffic.API
                     OnMessageReceived = context =>
                     {
                         var accessToken = context.Request.Query["access_token"];
-
                         var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
 
                         if (!string.IsNullOrEmpty(accessToken))
                         {
                             context.Token = accessToken;
-                            if (_printAuth)
-                            {
-                                Console.WriteLine($"Token from query: {accessToken.ToString()[..20]}...");
-                            }
                         }
                         else if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
                         {
                             context.Token = authHeader["Bearer ".Length..];
-                            if (_printAuth)
-                            {
-                                Console.WriteLine($"Token from header: {context.Token}...");
-                            }
                         }
 
                         return Task.CompletedTask;
@@ -225,14 +208,6 @@ namespace Traffic.API
                     OnAuthenticationFailed = context =>
                     {
                         Console.WriteLine($"Authentication failed: {context.Exception.Message}");
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = context =>
-                    {
-                        if (_printAuth)
-                        {
-                            Console.WriteLine($"Token validated for: {context.Principal?.Identity?.Name}");
-                        }
                         return Task.CompletedTask;
                     }
                 };

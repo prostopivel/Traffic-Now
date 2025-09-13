@@ -17,10 +17,19 @@ namespace Traffic.API.Contracts
             return pointResponse;
         }
 
-        public static (Map?, string Error) CreateMap(MapRequest mapRequest)
+        public static (Map?, string Error) CreateMap(MapRequestCreate mapRequest)
         {
             (var map, var Error) = Map.Create(
                 Guid.NewGuid(),
+                mapRequest.Name);
+
+            return (map, Error);
+        }
+
+        public static (Map?, string Error) CreateMap(MapRequest mapRequest)
+        {
+            (var map, var Error) = Map.Create(
+                mapRequest.Id,
                 mapRequest.Name);
 
             return (map, Error);

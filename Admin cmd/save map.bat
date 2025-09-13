@@ -11,7 +11,7 @@ echo Hashed password: %HASHED_PASSWORD%
 echo.
 
 echo === LOGIN ===
-curl -X POST "https://localhost:7003/api/auth/login" ^
+curl -X POST "https://traffic-now.onrender.com/api/auth/login" ^
      -H "Content-Type: application/json" ^
      -d "{\"Username\": \"admin@gmail.com\", \"Password\": \"%HASHED_PASSWORD%\"}" -s -o login_response.txt -w "HTTP Status: %%{http_code}\n"
      
@@ -56,7 +56,7 @@ echo.
 echo === GETTING MAP INFO ===
 
 :: Получаем информацию о карте используя query parameter
-curl -X GET "https://localhost:7003/api/map?id=!MAP_ID!" ^
+curl -X GET "https://traffic-now.onrender.com/api/map?id=!MAP_ID!" ^
      -H "Authorization: Bearer !TOKEN!" ^
      -s -o map_info.txt -w "HTTP Status: %%{http_code}\n"
 
@@ -111,7 +111,7 @@ set /p ENCODED_PATH=<temp_encoded.txt
 del temp_encoded.txt
 
 :: Отправляем запрос на сохранение
-curl -X POST "https://localhost:7003/api/map/saveMap?path=!ENCODED_PATH!&mapId=!MAP_ID!" ^
+curl -X POST "https://traffic-now.onrender.com/api/map/saveMap?path=!ENCODED_PATH!&mapId=!MAP_ID!" ^
      -H "Authorization: Bearer !TOKEN!" ^
      -s -o save_response.txt -w "HTTP Status: %%{http_code}\n"
 

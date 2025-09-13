@@ -11,7 +11,7 @@ echo Hashed password: %HASHED_PASSWORD%
 echo.
 
 echo === LOGIN ===
-curl -X POST "https://localhost:7003/api/auth/login" ^
+curl -X POST "https://traffic-now.onrender.com/api/auth/login" ^
      -H "Content-Type: application/json" ^
      -d "{\"Username\": \"admin@gmail.com\", \"Password\": \"%HASHED_PASSWORD%\"}" -s -o login_response.txt -w "HTTP Status: %%{http_code}\n"
      
@@ -51,7 +51,7 @@ if "!MAP_NAME!"=="" set "MAP_NAME=Default"
 echo.
 echo === CREATING A MAP: !MAP_NAME! ===
 
-curl -X POST "https://localhost:7003/api/map/create" ^
+curl -X POST "https://traffic-now.onrender.com/api/map/create" ^
      -H "Content-Type: application/json" ^
      -H "Authorization: Bearer !TOKEN!" ^
      -d "\"!MAP_NAME!\"" -s -o map_response.txt -w "HTTP Status: %%{http_code}\n"

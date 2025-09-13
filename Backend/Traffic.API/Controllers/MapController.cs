@@ -24,7 +24,7 @@ namespace Traffic.API.Controllers
 
         [HttpPost("create")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateMap([FromBody] MapRequest mapRequest)
+        public async Task<IActionResult> CreateMap([FromBody] MapRequestCreate mapRequest)
         {
             (var map, var Error) = ContractsFactory.CreateMap(mapRequest);
             if (!string.IsNullOrEmpty(Error) || map == null)

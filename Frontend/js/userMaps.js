@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (button.disabled) return;
 
+            event.stopPropagation();
+            event.preventDefault();
+
             const id = button.id.replace('delete-map-btn-', '');
             deleteMap(id, event);
         }
@@ -157,12 +160,12 @@ function displaySearchResults(maps) {
 
 async function addMapToUser(mapId) {
     try {
-        const result = await getProtectedData('map/addUserMap', 'POST', {
+        const result = await getBodyProtectedData('map/addUserMap', 'POST', {
             mapId: mapId
         });
 
         if (result) {
-            showSuccess('Карта успешно добавлена!');
+            alert('Карта успешно добавлена!');
 
             await loadMaps();
 
@@ -170,16 +173,19 @@ async function addMapToUser(mapId) {
             if (addButton) {
                 addButton.textContent = 'Добавлена';
                 addButton.disabled = true;
+                addButton.classList.add('added');
             }
 
             setTimeout(() => {
                 const searchResults = document.getElementById('searchResults');
-                searchResults.classList.remove('visible');
+                if (searchResults) {
+                    searchResults.classList.remove('visible');
+                }
             }, 1500);
         }
     } catch (error) {
         console.error('Ошибка добавления карты:', error);
-        showError('Не удалось добавить карту');
+        alert('Не удалось добавить карту');
     }
 }
 
@@ -192,10 +198,9 @@ function clearSearch() {
 
 function renderMaps(maps) {
     const container = document.getElementById('mapsContainer');
-    const emptyContainer = '';
 
     if (!maps || maps.length === 0) {
-        emptyContainer.innerHTML = `
+        container.innerHTML = `
             <div class="no-results">
                 <i class="fas fa-map-marked-alt"></i>
                 <p>Нет доступных карт</p>
@@ -204,12 +209,10 @@ function renderMaps(maps) {
                 </p>
             </div>
         `;
-        container.appendChild(emptyContainer);
         return;
     }
 
     container.innerHTML = '';
-
     maps.forEach(map => {
         const mapCard = createMapCard(map);
         container.appendChild(mapCard);
@@ -349,9 +352,10 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-async function deleteMap(transportId, event) {
+async function deleteMap(mapId, event) {
     if (event) {
         event.stopPropagation();
+        event.preventDefault();
     }
 
     if (!confirm('Вы уверены, что хотите удалить эту карту?')) {
@@ -360,17 +364,17 @@ async function deleteMap(transportId, event) {
 
     try {
         await getProtectedData('map/deleteMap', 'DELETE', {
-            transportId: transportId
+            mapId: mapId
         });
 
-        allTransport = allTransport.filter(t => t.id !== transportId);
+        allMaps = allMaps.filter(m => m.id !== mapId);
         renderMaps(allMaps);
 
-        showSuccess('Транспорт успешно удален!');
+        showSuccess('Карта успешно удалена!');
 
     } catch (error) {
-        console.error('Ошибка удаления транспорта:', error);
-        showError('Не удалось удалить транспорт');
+        console.error('Ошибка удаления карты:', error);
+        showError('Не удалось удалить карту');
     }
 }
 

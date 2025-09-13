@@ -54,7 +54,7 @@ echo === CREATING A MAP: !MAP_NAME! ===
 curl -X POST "https://traffic-now.onrender.com/api/map/create" ^
      -H "Content-Type: application/json" ^
      -H "Authorization: Bearer !TOKEN!" ^
-     -d "\"!MAP_NAME!\"" -s -o map_response.txt -w "HTTP Status: %%{http_code}\n"
+     -d "{\"name\": \"!MAP_NAME!\"}" -s -o map_response.txt -w "HTTP Status: %%{http_code}\n"
 
 if errorlevel 1 (
     echo Error creating map!

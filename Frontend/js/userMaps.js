@@ -1,4 +1,4 @@
-import { logout, getProtectedData } from "./utils.js";
+import { logout, getProtectedData, getBodyProtectedData } from "./utils.js";
 
 let allMaps = [];
 let searchTimeout = null;

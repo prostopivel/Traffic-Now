@@ -9,3 +9,15 @@ services:
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+
+  - type: web
+    name: traffic-frontend
+    plan: free
+    branch: main
+    rootDir: Frontend
+    runtime: node
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: FRONT_APP_API_URL
+        value: https://traffic-now.onrender.com

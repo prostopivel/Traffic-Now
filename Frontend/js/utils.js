@@ -1,4 +1,4 @@
-export const serverPath = 'https://localhost:7003/';
+export const serverPath = 'https://traffic-now.onrender.com/';
 
 function loadTheme() {
     const savedTheme = localStorage.getItem('theme') || 'light';

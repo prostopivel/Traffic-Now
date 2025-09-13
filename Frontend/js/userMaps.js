@@ -160,7 +160,7 @@ function displaySearchResults(maps) {
 
 async function addMapToUser(mapId) {
     try {
-        const result = await getBodyProtectedData('map/addUserMap', 'POST', {
+        const result = await getProtectedData('map/addUserMap', 'POST', {
             mapId: mapId
         });
 

@@ -1,3 +1,5 @@
+create index if not exists UserEmailIndex on Users (Email);
+
 create or replace function create_unique_email_user()
 returns trigger as $$
 begin

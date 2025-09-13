@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: traffic-now
+    runtime: docker
+    plan: free
+    branch: main
+    dockerContext: .
+    buildCommand: dotnet publish -c Release -o ./publish
+    startCommand: cd ./publish && ./Traffic.API.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production

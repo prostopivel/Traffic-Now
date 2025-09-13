@@ -64,5 +64,3 @@ create table if not exists Users_Transport (
 	foreign key(UserId) references Users(Id) on delete cascade,
 	foreign key(TransportId) references Transport(Id) on delete cascade
 );
-
-create index if not exists UserEmailIndex on Users (Email);

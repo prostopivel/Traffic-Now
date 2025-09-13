@@ -53,7 +53,6 @@ namespace Traffic.Data.Services
             try
             {
                 await ExecuteSqlScriptsAsync();
-
                 _logger.LogInformation("Database initialized successfully");
             }
             catch (Exception ex)

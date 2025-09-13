@@ -20,6 +20,9 @@ namespace Traffic.API
 
         public static void Main(string[] args)
         {
+            System.Net.ServicePointManager.DnsRefreshTimeout = 0;
+            AppContext.SetSwitch("System.Net.SocketsHttpHandler.Http3Support", false);
+
             var builder = WebApplication.CreateBuilder(args);
             var connectionString = builder.Configuration.GetConnectionString("PostgreSQL")
                 ?? DEFAULT_CONNECTION_STRING;
@@ -85,7 +88,7 @@ namespace Traffic.API
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
+                //app.UseHsts();
             }
 
             app.Use(ConfigureWebSocket);
@@ -108,7 +111,8 @@ namespace Traffic.API
                 .RequireAuthorization();
             app.MapHub<TransportAPIHub>("/transportAPIHub");
 
-            app.Run();
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+            app.Run($"http://0.0.0.0:{port}");
         }
 
         private static async Task ConfigureWebSocket(HttpContext context, Func<Task> next)

@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Files\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Update="Files\**\*" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -22,4 +22,10 @@
     <ProjectReference Include="..\Transport.Data\Transport.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Files\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

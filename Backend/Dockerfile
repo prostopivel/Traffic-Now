@@ -11,7 +11,7 @@ RUN dotnet restore "Traffic.API.sln"
 
 COPY . .
 
-WORKDIR "/src/Traffic.API"
+WORKDIR "/Traffic.API"
 RUN dotnet publish -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final

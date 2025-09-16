@@ -11,7 +11,7 @@ RUN dotnet restore "Transport.API.sln"
 
 COPY . .
 
-WORKDIR "/Transport.API"
+WORKDIR "/src/Transport.API"
 RUN dotnet publish -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final

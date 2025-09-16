@@ -21,4 +21,4 @@ COPY --from=build /app .
 ENV ASPNETCORE_URLS=http://*:$PORT
 EXPOSE $PORT
 
-ENTRYPOINT ["dotnet", "Transport API.dll"]
+ENTRYPOINT ["dotnet", "Transport.API.dll"]

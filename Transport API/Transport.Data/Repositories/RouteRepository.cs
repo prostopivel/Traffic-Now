@@ -1,7 +1,6 @@
 ﻿using Transport.Core.Abstractions;
+using Transport.Core.Algorithms;
 using Transport.Core.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Transport.Data.Repositories
 {
@@ -56,72 +55,31 @@ namespace Transport.Data.Repositories
                 if (_garagePoint == null) return;
             }
 
-            var route = GenerateDepthFirstRoute(map, _garagePoint);
-
-            int maxRouteLength = _random.Next(5, Math.Min(16, map.Points.Count + 1));
-            var limitedRoute = route.Take(maxRouteLength).ToList();
-
-            foreach (var point in limitedRoute)
+            Point? targetPoint;
+            do
             {
-                _points.Enqueue(point);
-            }
-        }
+                targetPoint = GetRandomPoint(map);
+            } while (targetPoint == null || targetPoint.Id == _garagePoint.Id);
 
-        private List<Point> GenerateDepthFirstRoute(Map map, Point startPoint)
-        {
-            var route = new List<Point>();
-            var visited = new HashSet<Guid>();
-            var stack = new Stack<Point>();
+            var optimalPath = DijkstraAlgorithm.FindShortestPath(map, _garagePoint, targetPoint);
 
-            stack.Push(startPoint);
-            visited.Add(startPoint.Id);
-
-            while (stack.Count > 0 && route.Count < map.Points.Count * 2)
+            if (optimalPath != null && optimalPath.Count > 0)
             {
-                var current = stack.Pop();
-                route.Add(current);
-
-                var connectedPoints = GetConnectedPoints(map, current).ToList();
-
-                if (connectedPoints.Count > 0)
+                foreach (var point in optimalPath)
                 {
-                    var unvisitedPoints = connectedPoints.Where(p => !visited.Contains(p.Id)).ToList();
-                    var visitedPoints = connectedPoints.Where(p => visited.Contains(p.Id)).ToList();
-
-                    var shuffledUnvisited = unvisitedPoints.OrderBy(_ => _random.Next()).ToList();
-                    foreach (var point in shuffledUnvisited)
-                    {
-                        visited.Add(point.Id);
-                        stack.Push(point);
-                    }
-
-                    if (visitedPoints.Count > 0 && _random.NextDouble() < 0.3)
-                    {
-                        var randomVisitedPoint = visitedPoints[_random.Next(visitedPoints.Count)];
-                        stack.Push(randomVisitedPoint);
-                    }
+                    _points.Enqueue(point);
                 }
             }
-
-            return route;
         }
 
         private Point? GetRandomPoint(Map map)
         {
-            if (map.Points.Count == 0) return null;
-            return map.Points[_random.Next(map.Points.Count)];
-        }
-
-        private static IEnumerable<Point> GetConnectedPoints(Map map, Point point)
-        {
-            foreach (var connectedPointId in point.ConnectedPointsIds)
+            if (map.Points.Count == 0)
             {
-                var connectedPoint = map.Points.FirstOrDefault(p => p.Id == connectedPointId);
-                if (connectedPoint != null)
-                {
-                    yield return connectedPoint;
-                }
+                return null;
             }
+
+            return map.Points[_random.Next(map.Points.Count)];
         }
     }
 }

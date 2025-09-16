@@ -18,11 +18,14 @@ namespace Transport.Data.Repositories
 
         public TransportRepository(IConfiguration configuration)
         {
-            _path = string.IsNullOrEmpty(configuration["MapPath"])
-                ? Path.GetDirectoryName(Environment.ProcessPath)! + "\\Files"
+            var basePath = string.IsNullOrEmpty(configuration["MapPath"])
+                ? AppContext.BaseDirectory
                 : configuration["MapPath"]!;
 
-            _path += "\\transport.json";
+            _path = Path.Combine(basePath, "Files", "transport.json");
+
+            Console.WriteLine($"Transport file path: {_path}");
+            Console.WriteLine($"File exists: {File.Exists(_path)}");
         }
 
         public void CreateTransport(IDataService _dataService)

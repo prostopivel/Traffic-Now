@@ -16,26 +16,40 @@ namespace Transport.Data.Repositories
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
+
         public MapRepository(IConfiguration configuration)
         {
+            var appBasePath = AppContext.BaseDirectory;
+
             _path = string.IsNullOrEmpty(configuration["MapPath"])
-                ? Path.GetDirectoryName(Environment.ProcessPath)! + "\\Files"
+                ? Path.Combine(appBasePath, "Files")
                 : configuration["MapPath"]!;
 
             if (!Directory.Exists(_path))
             {
+                if (string.IsNullOrEmpty(configuration["MapPath"]))
+                {
+                    throw new DirectoryNotFoundException($"Директория с файлами карт не найдена: '{_path}'. Убедитесь, что файлы скопировались при публикации.");
+                }
                 Directory.CreateDirectory(_path);
             }
 
             try
             {
-                _path = Directory.GetFiles(_path)
-                    .Where(f => f.Split('\\').Last().StartsWith("map_"))
-                    .First();
+                var files = Directory.GetFiles(_path)
+                    .Where(f => Path.GetFileName(f).StartsWith("map_"))
+                    .ToList();
+
+                if (files.Count == 0)
+                {
+                    throw new FileNotFoundException($"В директории '{_path}' не найдено файлов карт (начинающихся с 'map_')");
+                }
+
+                _path = files.First();
             }
-            catch
+            catch (Exception ex) when (ex is not FileNotFoundException)
             {
-                throw new FileNotFoundException($"Нужен файл карты в директории '{_path}'");
+                throw new FileNotFoundException($"Ошибка при поиске файлов карт в директории '{_path}'", ex);
             }
         }
 

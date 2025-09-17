@@ -1,11 +1,11 @@
 Traffic Now
-  Приложение "Traffic Now" состоит из 4-х основных модулей:
-1. Backend - Сервер приложения, к которому подключаются пользователи и транспорты. Задача - хранение и обработка информации.
-2. Frontend - Клиентская часть приложения. Задача - отображение информации и удобное место работы для пользователей.
-3. Transport.API - API Для отдельного транспорта. Задача - имитация движения транспорта и отправляет данные на сервер.
-4. Admin cmd - Панель для работы администратора. Задача - управление защищенными данными.
-  Настройка и запуск:
-1. Устанавливаем: .NET, Postgres (либо ставим контейнер Docker), React.js.
-2. Билдим сервер с помощью .NET.
-3. Настраиваем билд (aapsettings.json), а именно: страка подключения к БД ("ConnectionStrings") и "InitDB" - true (для первого запуска).
-4. Запускаем сервер, затем клиент (с помощью npm start). Сайт работает на порту 3000
+  The Traffic Now application consists of 4 main modules:
+1. Backend is the application server that users and transports connect to. The task is to store and process information.
+2. Frontend is the client part of the application. The task is to display information and a convenient place of work for users.
+3. Transport.API - API For a separate transport. The task is to simulate traffic and send the data to the server.
+4. Admin cmd - A panel for the work of the administrator. The task is to manage protected data.
+  Setup and launch:
+1. Install: .NET, Postgres (or we install a Docker container), Node.js.
+2. Build the server using .NET.
+3. Configure the build (aokp settings.json), namely: the DB connection string ("ConnectionStrings") and "InitDB" are true (for the first run).
+4. We start the server, then the client (using npm start). The website runs on port 3000.

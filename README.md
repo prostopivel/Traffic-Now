@@ -9,3 +9,7 @@ Traffic Now
 2. Build the server using .NET.
 3. Configure the build (aokp settings.json), namely: the DB connection string ("ConnectionStrings") and "InitDB" are true (for the first run).
 4. We start the server, then the client (using npm start). The website runs on port 3000.
+  Deploys:
+https://traffic-now-transport.onrender.com - API for transport
+https://traffic-now.onrender.com - the server
+https://traffic-now-front.onrender.com - frontend

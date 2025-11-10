@@ -14,6 +14,8 @@ https://traffic-now-transport.onrender.com - API for transport
 https://traffic-now.onrender.com - the server
 https://traffic-now-front.onrender.com - frontend
 
-<img width="900" height="580" alt="image" src="https://github.com/user-attachments/assets/187b05ad-bde4-4a7d-acaa-32e35fab75dd" />
-<img width="900" height="580" alt="image" src="https://github.com/user-attachments/assets/ee8af9ef-8272-4eef-b52b-969978b24894" />
-<img width="900" height="580" alt="image" src="https://github.com/user-attachments/assets/77da7de2-bb70-4f3f-a023-a496eeb9d8c7" />
+<img width="500" height="320" alt="image" src="https://github.com/user-attachments/assets/187b05ad-bde4-4a7d-acaa-32e35fab75dd" />
+<img width="500" height="320" alt="image" src="https://github.com/user-attachments/assets/ee8af9ef-8272-4eef-b52b-969978b24894" />
+<img width="500" height="320" alt="image" src="https://github.com/user-attachments/assets/2a7c744f-daf8-446b-8a51-aca2d8ee34e6" />
+<img width="500" height="320" alt="image" src="https://github.com/user-attachments/assets/7bf26fbe-1124-471c-9f5b-fc80016988d3" />
+

@@ -13,3 +13,7 @@ Traffic Now
 https://traffic-now-transport.onrender.com - API for transport
 https://traffic-now.onrender.com - the server
 https://traffic-now-front.onrender.com - frontend
+
+<img width="900" height="580" alt="image" src="https://github.com/user-attachments/assets/187b05ad-bde4-4a7d-acaa-32e35fab75dd" />
+<img width="900" height="580" alt="image" src="https://github.com/user-attachments/assets/ee8af9ef-8272-4eef-b52b-969978b24894" />
+<img width="900" height="580" alt="image" src="https://github.com/user-attachments/assets/77da7de2-bb70-4f3f-a023-a496eeb9d8c7" />
